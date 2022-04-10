@@ -1,0 +1,51 @@
+{
+  "name": "cerus-api",
+  "version": "0.1.0",
+  "description": "API backend for Cerus",
+  "main": "dist/index.js",
+  "types": "typings/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint:js": "eslint --ext \".js,.ts,.mjml\" --ignore-path .gitignore .",
+    "lint:prettier": "prettier --check .",
+    "lint": "npm run lint:js && npm run lint:prettier"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MidstallSoftware/cerus-api.git"
+  },
+  "author": "Tristan Ross",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/MidstallSoftware/cerus-api/issues"
+  },
+  "homepage": "https://github.com/MidstallSoftware/cerus-api#readme",
+  "dependencies": {
+    "@mikro-orm/core": "^5.1.1",
+    "@mikro-orm/mariadb": "^5.1.1",
+    "@mikro-orm/migrations": "^5.1.1",
+    "@mikro-orm/reflection": "^5.1.1",
+    "@mikro-orm/sqlite": "^5.1.1",
+    "date-fns-tz": "^1.3.3",
+    "deepmerge": "^4.2.2",
+    "discord.js": "file:submodules/discord.js",
+    "ejs": "^3.1.6",
+    "express": "^4.17.3",
+    "mjml": "^4.12.0",
+    "nodemailer": "^6.7.3",
+    "redis": "^4.0.6",
+    "wait-on": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/ejs": "^3.1.0",
+    "@types/mjml": "^4.7.0",
+    "@types/node": "^17.0.23",
+    "@types/nodemailer": "^6.4.4",
+    "@types/wait-on": "^5.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.18.0",
+    "@typescript-eslint/parser": "^5.18.0",
+    "eslint": "^8.13.0",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.3"
+  }
+}

@@ -27,7 +27,7 @@ export async function init() {
     })
   }
 
-  DI.cache = await initCache()
+  DI.cache = initCache()
   DI.db = await initDatabase()
   DI.mail = await initMail()
   DI.serverStart = utcToZonedTime(new Date().toUTCString(), config.timezone)

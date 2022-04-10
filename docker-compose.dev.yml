@@ -1,0 +1,135 @@
+version: '3'
+services:
+  db:
+    image: 'yobasystems/alpine-mariadb:10.4.13'
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - 'data-db:/var/lib/mysql'
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_ROOT_HOST: '%'
+    logging:
+      driver: none
+    env_file:
+      - ./.env
+    networks:
+      - servers
+    restart: on-failure
+  cache:
+    image: 'redis:6.2-alpine'
+    command: >
+      --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - 'data-cache:/data'
+    env_file:
+      - ./.env
+    logging:
+      driver: none
+    networks:
+      - servers
+    restart: on-failure
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8088:8025
+    logging:
+      driver: 'none'
+    environment:
+      MH_STORAGE: 'memory'
+    networks:
+      - servers
+    restart: on-failure
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 8089:9090
+    logging:
+      driver: none
+    volumes:
+      - type: bind
+        source: './prometheus.yml'
+        target: '/etc/prometheus/prometheus.yml'
+    networks:
+      - servers
+    restart: on-failure
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    logging:
+      driver: none
+    networks:
+      - servers
+    restart: on-failure
+  kafka:
+    image: 'bitnami/kafka:latest'
+    depends_on:
+      - zookeeper
+    logging:
+      driver: none
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://127.0.0.1:9092
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    volumes:
+      - 'data-kafka:/bitnami/kafka'
+    networks:
+      - servers
+    restart: on-failure
+  kowl:
+    image: 'quay.io/cloudhut/kowl:master'
+    ports:
+      - 8090:8080
+    depends_on:
+      - kafka
+    logging:
+      driver: none
+    env_file:
+      - ./.env
+    networks:
+      - servers
+    restart: on-failure
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    entrypoint: ['npm', 'run', 'dev']
+    depends_on:
+      - db
+      - cache
+      - mailhog
+      - prometheus
+      - kafka
+    ports:
+      - 8080:8080
+    environment:
+      NODE_ENV: 'development'
+      EMAIL_HOST: 'mailhog'
+      EMAIL_PORT: 1025
+    env_file:
+      - ./.env
+    volumes:
+      - ./data:/usr/src/server/data
+      - ./src:/usr/src/server/src
+      - type: bind
+        source: './database.sqlite'
+        target: '/usr/src/server/database.sqlite'
+    networks:
+      - servers
+    restart: on-failure
+
+volumes:
+  data-cache:
+    driver: local
+  data-db:
+    driver: local
+  data-kafka:
+    driver: local
+
+networks:
+  servers:
+    driver: bridge

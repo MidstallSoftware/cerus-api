@@ -1,8 +1,10 @@
 import Redis from 'ioredis'
 import config from '../config'
+import winston from '../providers/winston'
 
-export async function initCache() {
+export function initCache() {
+  winston.debug('Connecting to Redis')
   const client = new Redis(config.cache)
-  await client.connect()
+  winston.info('Connected to Redis')
   return client
 }

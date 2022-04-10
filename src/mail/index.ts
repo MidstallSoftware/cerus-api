@@ -4,8 +4,9 @@ import mjml from 'mjml'
 import Mail from 'nodemailer/lib/mailer'
 import { join } from 'path'
 import { DI } from '../di'
+import config from '../config'
 
-const templateDir = join(__dirname, 'templates')
+const templateDir = join(config.dataDir, 'templates')
 const templateNames = readdirSync(templateDir)
 const templates = Object.fromEntries(
   templateNames.map((name) => [

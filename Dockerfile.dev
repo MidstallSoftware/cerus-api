@@ -8,7 +8,7 @@ RUN mkdir -p /usr/src/server
 WORKDIR /usr/src/server
 
 COPY . /usr/src/server/
-RUN npm install && npm run build && npm prune --production && rm -rf src
+RUN npm install && npm run build
 
 EXPOSE 8080
 CMD ["npm", "start"]

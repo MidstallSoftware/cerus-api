@@ -1,0 +1,95 @@
+version: '3'
+services:
+  db:
+    image: 'yobasystems/alpine-mariadb:10.4.13'
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - 'data-db:/var/lib/mysql'
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_ROOT_HOST: '%'
+    env_file:
+      - ./.env
+    networks:
+      - servers
+    logging:
+      driver: 'none'
+    restart: on-failure
+  cache:
+    image: 'redis:6.2-alpine'
+    command: >
+      --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - 'data-cache:/data'
+    env_file:
+      - ./.env
+    networks:
+      - servers
+    logging:
+      driver: 'none'
+    restart: on-failure
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 8089:9090
+    volumes:
+      - type: bind
+        source: './prometheus.yml'
+        target: '/etc/prometheus/prometheus.yml'
+    networks:
+      - servers
+    restart: on-failure
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - servers
+    restart: on-failure
+  kafka:
+    image: 'bitnami/kafka:latest'
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://127.0.0.1:9092
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    volumes:
+      - 'data-kafka:/bitnami/kafka'
+    networks:
+      - servers
+    restart: on-failure
+  api:
+    build: .
+    entrypoint: ['npm', 'run', 'start']
+    depends_on:
+      - db
+      - cache
+      - mailhog
+      - prometheus
+      - kafka
+    ports:
+      - 8080:8080
+    environment:
+      NODE_ENV: 'production'
+    env_file:
+      - ./.env
+    networks:
+      - servers
+    restart: on-failure
+
+volumes:
+  data-cache:
+    driver: local
+  data-db:
+    driver: local
+  data-kafka:
+    driver: local
+
+networks:
+  servers:
+    driver: bridge

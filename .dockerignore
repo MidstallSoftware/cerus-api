@@ -2,3 +2,4 @@
 .gitmodules
 node_modules
 dist
+*.sqlite

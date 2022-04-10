@@ -2,7 +2,9 @@ import { join } from 'path'
 import { MikroORM } from '@mikro-orm/core'
 import { TSMigrationGenerator } from '@mikro-orm/migrations'
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection'
+import { RedisCacheAdapter } from 'mikro-orm-cache-adapter-redis'
 import config from '../config'
+import { DI } from '../di'
 
 export async function initDatabase() {
   return await MikroORM.init({
@@ -21,6 +23,12 @@ export async function initDatabase() {
     entitiesTs: [join(config.buildDir, 'database', 'entities')],
     debug: !config.production,
     type: config.production ? 'mariadb' : 'sqlite',
+    resultCache: {
+      adapter: RedisCacheAdapter,
+      options: {
+        client: DI.cache,
+      },
+    },
     ...config.db,
   })
 }

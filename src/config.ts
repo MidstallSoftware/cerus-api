@@ -1,7 +1,7 @@
 import { Options as DBOptions } from '@mikro-orm/core'
 import { Options as SMTPOptions } from 'nodemailer/lib/smtp-transport'
 import { join } from 'path'
-import { RedisClientOptions } from 'redis'
+import { RedisOptions } from 'ioredis'
 
 type EnvType = 'production' | 'development' | 'testing' | 'none'
 
@@ -15,7 +15,7 @@ interface Config {
   production: boolean
   mail: SMTPOptions
   db: DBOptions
-  cache: RedisClientOptions
+  cache: RedisOptions
   timezone: string
 }
 
@@ -46,10 +46,8 @@ const config: Config = {
   },
   cache: {
     password: process.env.REDIS_PASSWORD,
-    socket: {
-      host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-    },
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT || '6379'),
   },
   timezone: process.env.TZ ?? 'Etc/UTC',
 }

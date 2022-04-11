@@ -14,7 +14,8 @@ export function requireAuthHandler(
   } else {
     const run = async () => {
       const accessToken = await checkAccessToken(header)
-      res.locals.auth = { accessToken, user: accessToken.user }
+      req.auth = { accessToken, user: accessToken.user }
+      next()
     }
     run().catch((e) => next(e))
   }

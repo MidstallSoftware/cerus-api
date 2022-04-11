@@ -46,6 +46,7 @@ services:
     logging:
       driver: none
     volumes:
+      - data-prometheus:/prometheus
       - type: bind
         source: './prometheus.yml'
         target: '/etc/prometheus/prometheus.yml'
@@ -128,6 +129,8 @@ volumes:
   data-db:
     driver: local
   data-kafka:
+    driver: local
+  data-prometheus:
     driver: local
 
 networks:

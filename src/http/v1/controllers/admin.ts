@@ -25,7 +25,10 @@ export default function genController(): Record<
             }
 
             res.set('Content-Type', Prometheus.register.contentType)
-            res.send(Prometheus.register.metrics())
+            Prometheus.register
+              .metrics()
+              .then((v) => res.send(v))
+              .catch((e) => next(e))
           } catch (e) {
             next(e)
           }

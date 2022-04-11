@@ -1,8 +1,10 @@
 import { MikroORM } from '@mikro-orm/core'
+import Prometheus from 'prom-client'
 import { utcToZonedTime } from 'date-fns-tz'
 import { SentMessageInfo as SMTPSentMessageInfo } from 'nodemailer/lib/smtp-transport'
 import { Transporter } from 'nodemailer'
 import { Redis } from 'ioredis'
+import Stripe from 'stripe'
 import waitOn from 'wait-on'
 import config from './config'
 import { initCache } from './cache/client'
@@ -13,6 +15,7 @@ export const DI = {} as {
   cache: Redis
   db: MikroORM
   mail: Transporter<SMTPSentMessageInfo>
+  stripe: Stripe
   serverStart: Date
 }
 
@@ -30,5 +33,11 @@ export async function init() {
   DI.cache = initCache()
   DI.db = await initDatabase()
   DI.mail = await initMail()
+  DI.stripe = new Stripe(process.env.STRIPE_KEY as string, {
+    apiVersion: '2020-08-27',
+    typescript: true,
+  })
+
   DI.serverStart = utcToZonedTime(new Date().toUTCString(), config.timezone)
+  Prometheus.collectDefaultMetrics()
 }

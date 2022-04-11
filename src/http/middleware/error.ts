@@ -9,7 +9,12 @@ export function notFoundHandler(
   next(new HttpNotFoundError())
 }
 
-export function errorHandler(err: Error, _req: Request, res: Response) {
+export function errorHandler(
+  err: Error,
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const response = {
     status: 500,
     detail: 'Internal server error',
@@ -22,4 +27,5 @@ export function errorHandler(err: Error, _req: Request, res: Response) {
   }
 
   res.status(response.status).json(response)
+  next()
 }

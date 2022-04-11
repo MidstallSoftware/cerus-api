@@ -1,7 +1,12 @@
-import { PrimaryKey, Property } from '@mikro-orm/core'
+import {
+  PrimaryKey,
+  Property,
+  BaseEntity as MOBaseEntity,
+} from '@mikro-orm/core'
+import { APIObject } from '../http/types'
 import { nowUTC } from '../utils'
 
-export default class BaseEntity {
+export default class BaseEntity extends MOBaseEntity<BaseEntity, 'id'> {
   @PrimaryKey()
   id!: number
 
@@ -13,4 +18,11 @@ export default class BaseEntity {
 
   @Property({ nullable: true })
   deletedAt?: Date
+
+  transform(): APIObject {
+    return {
+      id: this.id,
+      created: this.createdAt,
+    }
+  }
 }

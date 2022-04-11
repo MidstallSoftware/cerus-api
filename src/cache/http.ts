@@ -37,6 +37,7 @@ export function expressCacheRoute(
         },
       })
       res.json(value)
+      next()
     } catch (e) {
       next(e)
     }

@@ -53,7 +53,7 @@ export class HttpUnauthorizedError extends HttpError {
   errors: string[]
 
   constructor(message: string) {
-    super('Bad request')
+    super('Unauthorized')
     this.errors = [message]
   }
 

@@ -60,6 +60,9 @@ const config: Config = {
   },
   kafka: {
     brokers: (process.env.KAFKA_BROKERS || '').split(','),
+    retry: {
+      retries: 30,
+    },
   },
   logLevels: {
     test: 'error',

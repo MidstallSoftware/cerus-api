@@ -29,14 +29,9 @@ services:
       driver: 'none'
     restart: on-failure
   prometheus:
-    image: prom/prometheus
-    ports:
-      - 8089:9090
+    image: cerus-api-prometheus
     volumes:
       - data-prometheus:/prometheus
-      - type: bind
-        source: './prometheus.yml'
-        target: '/etc/prometheus/prometheus.yml'
     networks:
       - servers
     restart: on-failure
@@ -64,13 +59,12 @@ services:
     networks:
       - servers
     restart: on-failure
-  api:
-    build: .
+  server:
+    image: cerus-api
     entrypoint: ['npm', 'run', 'start']
     depends_on:
       - db
       - cache
-      - mailhog
       - prometheus
       - kafka
     ports:

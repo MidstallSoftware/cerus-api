@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.dev.yml -o kube/dev
+    kompose.version: 1.26.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/servers: 'true'
+    io.kompose.service: mailhog
+  name: mailhog
+spec:
+  containers:
+    - env:
+        - name: MH_STORAGE
+          value: memory
+      image: mailhog/mailhog
+      name: mailhog
+      ports:
+        - containerPort: 8025
+      resources: {}
+  restartPolicy: OnFailure
+status: {}

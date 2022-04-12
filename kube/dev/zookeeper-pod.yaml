@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.dev.yml -o kube/dev
+    kompose.version: 1.26.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/servers: 'true'
+    io.kompose.service: zookeeper
+  name: zookeeper
+spec:
+  containers:
+    - env:
+        - name: ALLOW_ANONYMOUS_LOGIN
+          value: 'yes'
+      image: bitnami/zookeeper:latest
+      name: zookeeper
+      resources: {}
+  restartPolicy: OnFailure
+status: {}

@@ -30,7 +30,7 @@ const config: Config = {
   dataDir: join(__dirname, '..', 'data'),
   env,
   production,
-  port: parseInt(process.env.PORT || '8080'),
+  port: parseInt(process.env.PORT || '80'),
   mail: {
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.EMAIL_PORT || '587'),

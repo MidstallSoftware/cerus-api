@@ -8,8 +8,6 @@ services:
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
       MYSQL_ROOT_HOST: '%'
-    logging:
-      driver: none
     env_file:
       - ./.env
     networks:
@@ -23,8 +21,6 @@ services:
       - 'data-cache:/data'
     env_file:
       - ./.env
-    logging:
-      driver: none
     networks:
       - servers
     restart: on-failure
@@ -32,24 +28,17 @@ services:
     image: mailhog/mailhog
     ports:
       - 8088:8025
-    logging:
-      driver: 'none'
     environment:
       MH_STORAGE: 'memory'
     networks:
       - servers
     restart: on-failure
   prometheus:
-    image: prom/prometheus
+    image: cerus-api-prometheus
     ports:
       - 8089:9090
-    logging:
-      driver: none
     volumes:
       - data-prometheus:/prometheus
-      - type: bind
-        source: './prometheus.yml'
-        target: '/etc/prometheus/prometheus.yml'
     networks:
       - servers
     restart: on-failure
@@ -57,8 +46,6 @@ services:
     image: 'bitnami/zookeeper:latest'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-    logging:
-      driver: none
     networks:
       - servers
     restart: on-failure
@@ -66,8 +53,6 @@ services:
     image: 'bitnami/kafka:latest'
     depends_on:
       - zookeeper
-    logging:
-      driver: none
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
@@ -87,17 +72,13 @@ services:
       - 8090:8080
     depends_on:
       - kafka
-    logging:
-      driver: none
     env_file:
       - ./.env
     networks:
       - servers
     restart: on-failure
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
+  server:
+    image: cerus-api
     entrypoint: ['npm', 'run', 'dev']
     depends_on:
       - db
@@ -111,14 +92,12 @@ services:
       NODE_ENV: 'development'
       EMAIL_HOST: 'mailhog'
       EMAIL_PORT: 1025
+      USE_MYSQL: 1
     env_file:
       - ./.env
     volumes:
       - ./data:/usr/src/server/data
       - ./src:/usr/src/server/src
-      - type: bind
-        source: './database.sqlite'
-        target: '/usr/src/server/database.sqlite'
     networks:
       - servers
     restart: on-failure

@@ -1,6 +1,7 @@
 import { resolve } from 'dns/promises'
 import { NextFunction, Request, Response } from 'express'
 import Prometheus from 'prom-client'
+import config from '../../../config'
 import { HttpUnauthorizedError } from '../../exceptions'
 
 export default function genController(): Record<
@@ -9,7 +10,7 @@ export default function genController(): Record<
 > {
   return {
     metrics: (req, res, next) => {
-      resolve('prometheus')
+      resolve(config.prometheus.host)
         .then((records) => {
           try {
             if (

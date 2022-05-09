@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import makeApp from './http'
 import { init } from './di'
 import winston from './providers/winston'
@@ -13,6 +14,7 @@ init()
     })
   })
   .catch((err) => {
+    console.log(err)
     winston.error(err)
     process.exit(1)
   })

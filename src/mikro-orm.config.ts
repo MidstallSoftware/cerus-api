@@ -1,6 +1,10 @@
-import { Logger, LoggerNamespace, Options } from '@mikro-orm/core'
+import {
+  Logger,
+  LoggerNamespace,
+  Options,
+  ReflectMetadataProvider,
+} from '@mikro-orm/core'
 import { TSMigrationGenerator } from '@mikro-orm/migrations'
-import { TsMorphMetadataProvider } from '@mikro-orm/reflection'
 import { RedisCacheAdapter } from 'mikro-orm-cache-adapter-redis'
 import { join } from 'path'
 import Redis from 'ioredis'
@@ -42,7 +46,7 @@ const mikroOrmConfig: Options = {
   cache: {
     enabled: false,
   },
-  metadataProvider: TsMorphMetadataProvider,
+  metadataProvider: ReflectMetadataProvider,
   entities: [join(config.buildDir, 'database', 'entities')],
   entitiesTs: [join(config.sourceDir, 'database', 'entities')],
   debug: !config.production,

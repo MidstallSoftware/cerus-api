@@ -20,6 +20,9 @@ interface Config {
   db: DBOptions
   cache: RedisOptions
   kafka: KafkaConfig
+  prometheus: {
+    host: string
+  }
   logLevels: Record<string, string>
   timezone: string
 }
@@ -49,6 +52,7 @@ const config: Config = {
         ? process.env.DB_NAME ?? 'cerus'
         : process.env.DB_NAME ??
           (production ? 'cerus' : join(__dirname, '..', 'database.sqlite')),
+    port: parseInt(process.env.MYSQL_PORT || '3306'),
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
@@ -63,6 +67,9 @@ const config: Config = {
     retry: {
       retries: 30,
     },
+  },
+  prometheus: {
+    host: process.env.PROMETHEUS_HOST || 'prometheus',
   },
   logLevels: {
     test: 'error',

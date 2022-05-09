@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cerus-api
+  namespace: cerusbots
+  labels:
+    app: cerus-api
+spec:
+  selector:
+    matchLabels:
+      app: cerus-api
+  endpoints:
+    - port: http
+      path: /v1/admin/metrics
+      interval: 5s

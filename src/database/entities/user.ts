@@ -1,7 +1,7 @@
 import { Collection, Entity, Enum, OneToMany, Property } from '@mikro-orm/core'
 import { APIUser } from 'discord-api-types/v9'
 import Stripe from 'stripe'
-import { DI } from '~/di'
+import { DI } from '../../di'
 import BaseEntity from '../base'
 import AccessToken from './accesstoken'
 import Bot from './bot'

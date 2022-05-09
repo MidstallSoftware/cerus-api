@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston'
-import { KafkaTransport } from 'winston-logger-kafka'
-import TransportStream from 'winston-transport'
+// import { KafkaTransport } from 'winston-logger-kafka'
+// import TransportStream from 'winston-transport'
 import { StackFrame, get as getStackTrace } from 'stack-trace'
 import config from '../config'
 
@@ -33,11 +33,12 @@ const logger = createLogger({
   ),
   transports: [
     new transports.Console(),
-    new KafkaTransport({
+    // NOTE: Disable until the transport isn't buggy
+    /* new KafkaTransport({
       clientConfig: config.kafka,
       producerConfig: { allowAutoTopicCreation: true },
       sinkTopic: 'cerus-winston',
-    }) as unknown as TransportStream,
+    }) as unknown as TransportStream, */
   ],
 })
 export default logger

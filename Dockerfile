@@ -19,7 +19,10 @@ WORKDIR /usr/src/server
 
 COPY --chown=node:node --from=build /usr/src/server/data /usr/src/server/data
 COPY --chown=node:node --from=build /usr/src/server/dist /usr/src/server/dist
-COPY --chown=node:node --from=build /usr/src/server/node_modules /usr/src/server/node_modules
+COPY --chown=node:node --from=build /usr/src/server/node_modules /usr/src/server/node_modles
+COPY --chown=node:node --from=build /usr/src/server/node_modules /usr/src/server/node_modles
+COPY --chown=node:node --from=build /usr/src/server/package.json /usr/src/server/package.json
+COPY --chown=node:node --from=build /usr/src/server/package-lock.json /usr/src/server/package-lock.json
 
 EXPOSE 80
 ENTRYPOINT [ "dumb-init", "node", "dist/index.js" ]

@@ -6,6 +6,7 @@
   "types": "typings/index.d.ts",
   "type": "commonjs",
   "scripts": {
+    "prepare": "is-ci || husky install",
     "build": "tsc",
     "lint:js": "eslint --ext \".js,.ts,.mjml\" --ignore-path .gitignore .",
     "lint:prettier": "prettier --check .",
@@ -52,6 +53,7 @@
     "winston-logger-kafka": "^0.0.11"
   },
   "devDependencies": {
+    "@commitlint/config-conventional": "^16.2.4",
     "@mikro-orm/cli": "^5.1.2",
     "@types/ejs": "^3.1.0",
     "@types/express": "^4.17.13",
@@ -62,10 +64,17 @@
     "@types/wait-on": "^5.3.1",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
     "@typescript-eslint/parser": "^5.18.0",
+    "commitlint": "^16.2.4",
     "eslint": "^8.13.0",
+    "husky": "^8.0.0",
+    "is-ci": "^3.0.1",
+    "lint-staged": "^12.4.1",
     "prettier": "^2.6.2",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.6.3"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjml}": "eslint"
   },
   "mikro-orm": {
     "configPaths": [

@@ -6,7 +6,6 @@ load('ext://dotenv', 'dotenv')
 
 dotenv()
 
-k8s_yaml('./kube/namespace.yml')
 k8s_yaml(secret_from_dict('cerus-secrets', namespace='cerusbots', inputs = {
   'EMAIL_HOST': 'mailhog',
   'EMAIL_PORT': '1025',
@@ -54,7 +53,7 @@ k8s_resource('grafana', port_forwards='8081:3000')
 deployment_create('mailhog', 'mailhog/mailhog', namespace='cerusbots', ports=['8025:8025', '1025:1025'])
 k8s_resource('mailhog', labels=['cerus-monitoring'], port_forwards=8025)
 
-docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'node dist/index.js', live_update=[
+docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'npm run dev', dockerfile='./Dockerfile.dev', live_update=[
   sync('data', '/usr/src/server/data'),
   sync('src', '/usr/src/server/src'),
   sync('submodule', '/usr/src/server/submodule'),

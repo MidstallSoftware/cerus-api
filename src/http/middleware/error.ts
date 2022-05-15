@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { HttpError, HttpNotFoundError } from '../exceptions'
 import config from '../../config'
+import winston from '../../providers/winston'
 
 export function notFoundHandler(
   _req: Request,
@@ -27,6 +28,8 @@ export function errorHandler(
       Object.assign(response, err.toJSON())
     } else {
       response.detail = err.message
+      winston.error(err)
+
       if (!config.production && typeof err.stack === 'string')
         response.trace = err.stack.split('\n')
     }

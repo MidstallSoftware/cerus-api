@@ -1,4 +1,5 @@
 import { MikroORM } from '@mikro-orm/core'
+import { Kafka } from 'kafkajs'
 import Prometheus from 'prom-client'
 import { utcToZonedTime } from 'date-fns-tz'
 import { SentMessageInfo as SMTPSentMessageInfo } from 'nodemailer/lib/smtp-transport'
@@ -14,6 +15,7 @@ import { initMail } from './mail/client'
 export const DI = {} as {
   cache: Redis
   db: MikroORM
+  kafka: Kafka
   mail: Transporter<SMTPSentMessageInfo>
   stripe: Stripe
   serverStart: Date
@@ -30,6 +32,7 @@ export async function init() {
     })
   }
 
+  DI.kafka = new Kafka(config.kafka)
   DI.cache = initCache()
   DI.db = await initDatabase()
   DI.mail = await initMail()

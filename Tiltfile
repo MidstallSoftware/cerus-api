@@ -19,6 +19,8 @@ k8s_yaml(secret_from_dict('cerus-secrets', namespace='cerusbots', inputs = {
 }))
 
 helm_repo('bitnami', 'https://charts.bitnami.com/bitnami')
+helm_repo('cloudhut', 'https://raw.githubusercontent.com/cloudhut/charts/master/archives')
+
 helm_resource('redis', 'bitnami/redis', namespace='cerusbots', labels=['cerus-backend'], flags=[
   '--set', 'auth.existingSecret=cerus-secrets',
   '--set', 'auth.existingSecretPasswordKey=REDIS_PASSWORD',
@@ -43,15 +45,20 @@ helm_resource('prometheus', 'bitnami/kube-prometheus', namespace='cerusbots', la
   '--set', 'coreDns.enabled=false',
   '--set', 'kubeProxy.enabled=true'
 ])
-k8s_resource('prometheus', port_forwards='9090:9090')
+k8s_resource('prometheus', port_forwards='8080:9090')
 
 helm_resource('grafana', 'bitnami/grafana', namespace='cerusbots', labels=['cerus-monitoring'], flags=[
   '--set', 'service.type=LoadBalancer'
 ])
 k8s_resource('grafana', port_forwards='8081:3000')
 
+helm_resource('kowl', 'cloudhut/kowl', namespace='cerusbots', labels=['cerus-monitoring'], flags=[
+  '--set', 'kowl.config.kafka.brokers={kafka.cerusbots.svc.cluster.local:9092}'
+])
+k8s_resource('kowl', port_forwards='8082:8080')
+
 deployment_create('mailhog', 'mailhog/mailhog', namespace='cerusbots', ports=['8025:8025', '1025:1025'])
-k8s_resource('mailhog', labels=['cerus-monitoring'], port_forwards=8025)
+k8s_resource('mailhog', labels=['cerus-monitoring'], port_forwards=['8083:8025'])
 
 docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'npm run start', dockerfile='./Dockerfile.dev', live_update=[
   sync('data', '/usr/src/server/data'),
@@ -68,4 +75,4 @@ docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'npm run start', dockerf
 k8s_yaml('./kube/deploy.yml')
 k8s_yaml('./kube/service.yml')
 k8s_yaml('./kube/servicemonitor.yml')
-k8s_resource('cerus-api', labels=['cerus-backend'], port_forwards=['8080:80'])
+k8s_resource('cerus-api', labels=['cerus-backend'], port_forwards=['9090:80'])

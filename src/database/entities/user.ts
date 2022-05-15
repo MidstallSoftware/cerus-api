@@ -11,7 +11,6 @@ import Stripe from 'stripe'
 import { DI } from '../../di'
 import BaseEntity from '../base'
 import AccessToken from './accesstoken'
-import Bot from './bot'
 import Team from './team'
 import UserSetting from './usersetting'
 

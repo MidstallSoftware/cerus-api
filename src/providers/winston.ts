@@ -1,8 +1,52 @@
 import { createLogger, format, transports } from 'winston'
-// import { KafkaTransport } from 'winston-logger-kafka'
-// import TransportStream from 'winston-transport'
+import TransportStream from 'winston-transport'
 import { StackFrame, get as getStackTrace } from 'stack-trace'
 import config from '../config'
+import { DI } from '../di'
+import { CompressionTypes, Producer } from 'kafkajs'
+
+class KafkaTransport extends TransportStream {
+  private producer?: Producer
+
+  constructor(opts?: TransportStream.TransportStreamOptions) {
+    super(opts)
+  }
+
+  log(info: any, next: () => void) {
+    this.getProducer()
+      .then((producer) => {
+        if (typeof producer === 'object') {
+          producer
+            .send({
+              topic: 'cerus-logger',
+              messages: [{ value: JSON.stringify(info) }],
+              compression: CompressionTypes.GZIP,
+            })
+            .then(() => next())
+            .catch((e) => console.error(e))
+        } else {
+          next()
+        }
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }
+
+  private async getProducer() {
+    if (typeof this.producer !== 'object') {
+      if (typeof DI.kafka !== 'object') return undefined
+
+      this.producer = DI.kafka.producer({
+        allowAutoTopicCreation: true,
+      })
+
+      await this.producer.connect()
+    }
+
+    return this.producer
+  }
+}
 
 const caller = format((info) => {
   const genSource = (trace: StackFrame) => ({
@@ -23,6 +67,7 @@ const caller = format((info) => {
   return info
 })
 
+console.log(config.kafka)
 const logger = createLogger({
   level: config.logLevels[config.env],
   format: format.combine(
@@ -31,14 +76,6 @@ const logger = createLogger({
     format.splat(),
     format.simple()
   ),
-  transports: [
-    new transports.Console(),
-    // NOTE: Disable until the transport isn't buggy
-    /* new KafkaTransport({
-      clientConfig: config.kafka,
-      producerConfig: { allowAutoTopicCreation: true },
-      sinkTopic: 'cerus-winston',
-    }) as unknown as TransportStream, */
-  ],
+  transports: [new transports.Console(), new KafkaTransport()],
 })
 export default logger

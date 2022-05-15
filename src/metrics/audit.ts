@@ -13,7 +13,7 @@ export const auditDatabaseCreateMetric = new Gauge({
 })
 
 export const auditDatabaseDeleteMetric = new Gauge({
-  name: 'cerus_api_audit_database_create',
+  name: 'cerus_api_audit_database_delete',
   help: 'Audit metric for when a database entity is deleted',
   labelNames: ['tableName', 'id'],
 })

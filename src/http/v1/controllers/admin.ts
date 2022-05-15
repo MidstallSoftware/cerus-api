@@ -10,26 +10,42 @@ export default function genController(): Record<
 > {
   return {
     metrics: (req, res, next) => {
+      const remoteAddress = (req.socket.remoteAddress as string)
+        .replace('::ffff:', '')
+        .split('.')
+      const selfAddress = req.ip.replace('::ffff:', '').split('.')
+
+      const send = () => {
+        res.set('Content-Type', Prometheus.register.contentType)
+        Prometheus.register
+          .metrics()
+          .then((v) => res.send(v))
+          .catch((e) => next(e))
+      }
+
+      if (
+        remoteAddress[0] === selfAddress[0] &&
+        remoteAddress[1] === selfAddress[1] &&
+        remoteAddress[2] === selfAddress[2]
+      ) {
+        send()
+        return
+      }
+
       resolve(config.prometheus.host)
         .then((records) => {
           try {
             if (
               !records
                 .map((v) => v.replace('::ffff:', ''))
-                .includes(
-                  (req.socket.remoteAddress as string).replace('::ffff:', '')
-                )
+                .includes(remoteAddress.join('.'))
             ) {
               throw new HttpUnauthorizedError(
                 'Must be send through the prometheus server'
               )
             }
 
-            res.set('Content-Type', Prometheus.register.contentType)
-            Prometheus.register
-              .metrics()
-              .then((v) => res.send(v))
-              .catch((e) => next(e))
+            send()
           } catch (e) {
             next(e)
           }

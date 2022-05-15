@@ -67,7 +67,6 @@ const caller = format((info) => {
   return info
 })
 
-console.log(config.kafka)
 const logger = createLogger({
   level: config.logLevels[config.env],
   format: format.combine(

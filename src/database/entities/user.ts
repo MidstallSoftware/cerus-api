@@ -6,8 +6,9 @@ import {
   OneToMany,
   Property,
 } from '@mikro-orm/core'
-import { APIUser } from 'discord-api-types/v9'
+import { APIUser as DiscordUser } from 'discord-api-types/v9'
 import Stripe from 'stripe'
+import { APIUser } from '../../http/types'
 import { DI } from '../../di'
 import BaseEntity from '../base'
 import AccessToken from './accesstoken'
@@ -54,7 +55,10 @@ export default class User extends BaseEntity {
     )
   }
 
-  constructor(discord: string | APIUser, customer: string | Stripe.Customer) {
+  constructor(
+    discord: string | DiscordUser,
+    customer: string | Stripe.Customer
+  ) {
     super()
 
     if (typeof discord === 'string') this.discordId = discord
@@ -66,5 +70,13 @@ export default class User extends BaseEntity {
 
   getCustomer(): Promise<Stripe.Customer | Stripe.DeletedCustomer> {
     return DI.stripe.customers.retrieve(this.customerId)
+  }
+
+  transform(): APIUser {
+    return {
+      ...super.transform(),
+      banned: this.isBanned,
+      type: this.type,
+    }
   }
 }

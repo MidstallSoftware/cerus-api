@@ -4,7 +4,7 @@ import { init } from './di'
 import winston from './providers/winston'
 import config from './config'
 
-const app = makeApp()
+const { app } = makeApp()
 
 init()
   .then(() => {

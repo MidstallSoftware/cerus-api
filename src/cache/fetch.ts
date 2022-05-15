@@ -1,5 +1,10 @@
 import deepmerge from 'deepmerge'
-import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch'
+import fetch, {
+  RequestInfo,
+  RequestInit,
+  Response,
+  ResponseInit,
+} from 'node-fetch'
 import { Cacher, CacherConfig, createCacher } from './base'
 
 interface StoredResponse extends ResponseInit {

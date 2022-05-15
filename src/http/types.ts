@@ -9,3 +9,8 @@ export interface APIList<T extends APIObject> {
   size: number
   total: number
 }
+
+export interface APIUser extends APIObject {
+  banned: boolean
+  type: 'default' | 'admin'
+}

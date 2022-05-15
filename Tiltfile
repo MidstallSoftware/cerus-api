@@ -18,8 +18,8 @@ k8s_yaml(secret_from_dict('cerus-secrets', namespace='cerusbots', inputs = {
   'STRIPE_KEY': os.getenv('STRIPE_KEY')
 }))
 
-helm_repo('bitnami', 'https://charts.bitnami.com/bitnami')
-helm_repo('cloudhut', 'https://raw.githubusercontent.com/cloudhut/charts/master/archives')
+helm_repo('bitnami', 'https://charts.bitnami.com/bitnami', labels=['cerus-helm'])
+helm_repo('cloudhut', 'https://raw.githubusercontent.com/cloudhut/charts/master/archives', labels=['cerus-helm'])
 
 helm_resource('redis', 'bitnami/redis', namespace='cerusbots', labels=['cerus-backend'], flags=[
   '--set', 'auth.existingSecret=cerus-secrets',
@@ -75,4 +75,4 @@ docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'npm run start', dockerf
 k8s_yaml('./kube/deploy.yml')
 k8s_yaml('./kube/service.yml')
 k8s_yaml('./kube/servicemonitor.yml')
-k8s_resource('cerus-api', labels=['cerus-backend'], port_forwards=['9090:80'])
+k8s_resource('cerus-api', labels=['cerus-backend'], port_forwards=['3002:80'])

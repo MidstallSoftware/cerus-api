@@ -1,4 +1,5 @@
 import express from 'express'
+import expressWS from 'express-ws'
 import { errorHandler, notFoundHandler } from './middleware/error'
 import v1 from './v1'
 import logger from './middleware/logger'
@@ -6,6 +7,7 @@ import { postMetricHandler, preMetricHandler } from './middleware/metrics'
 
 export default function () {
   const app = express()
+  const websocket = expressWS(app)
 
   app.use(preMetricHandler)
   app.use(logger)
@@ -15,5 +17,5 @@ export default function () {
   app.use(notFoundHandler)
   app.use(errorHandler)
   app.use(postMetricHandler)
-  return app
+  return { app, websocket }
 }

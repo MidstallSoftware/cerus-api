@@ -7,6 +7,7 @@
   "type": "commonjs",
   "scripts": {
     "prepare": "is-ci || husky install",
+    "postinstall": "patch-package",
     "build": "tsc",
     "lint:js": "eslint --ext \".js,.ts,.mjml\" --ignore-path .gitignore .",
     "lint:prettier": "prettier --check .",
@@ -46,6 +47,7 @@
     "mjml": "^4.12.0",
     "node-fetch": "^3.2.3",
     "nodemailer": "^6.7.3",
+    "patch-package": "^6.4.7",
     "prom-client": "^14.0.1",
     "reflect-metadata": "^0.1.13",
     "stack-trace": "^0.0.10",

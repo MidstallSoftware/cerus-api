@@ -50,7 +50,7 @@ const mikroOrmConfig: Options = {
   entities: [join(config.buildDir, 'database', 'entities')],
   entitiesTs: [join(config.sourceDir, 'database', 'entities')],
   debug: !config.production,
-  type: config.production ? 'mariadb' : 'sqlite',
+  type: 'mariadb',
   resultCache: {
     adapter: RedisCacheAdapter,
     options: {

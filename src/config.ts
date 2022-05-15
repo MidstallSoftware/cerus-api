@@ -47,11 +47,7 @@ const config: Config = {
     debug: !production,
   },
   db: {
-    dbName:
-      process.env.USE_MYSQL && !production
-        ? process.env.DB_NAME ?? 'cerus'
-        : process.env.DB_NAME ??
-          (production ? 'cerus' : join(__dirname, '..', 'database.sqlite')),
+    dbName: process.env.MYSQL_DATABASE,
     port: parseInt(process.env.MYSQL_PORT || '3306'),
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,

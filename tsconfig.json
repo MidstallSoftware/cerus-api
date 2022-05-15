@@ -18,7 +18,6 @@
     "declaration": true,
     "declarationDir": "typings",
     "types": ["@types/node"],
-    "typeRoots": ["./types"],
     "paths": {
       "*": ["node_modules/*"],
       "~/*": ["./src/*"]

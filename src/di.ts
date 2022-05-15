@@ -39,5 +39,5 @@ export async function init() {
   })
 
   DI.serverStart = utcToZonedTime(new Date().toUTCString(), config.timezone)
-  Prometheus.collectDefaultMetrics()
+  Prometheus.collectDefaultMetrics({ prefix: 'cerus_api_' })
 }

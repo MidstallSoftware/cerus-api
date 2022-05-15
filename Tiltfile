@@ -54,14 +54,8 @@ deployment_create('mailhog', 'mailhog/mailhog', namespace='cerusbots', ports=['8
 k8s_resource('mailhog', labels=['cerus-monitoring'], port_forwards=8025)
 
 docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'npm run dev', dockerfile='./Dockerfile.dev', live_update=[
-  sync('data', '/usr/src/server/data'),
-  sync('src', '/usr/src/server/src'),
-  sync('submodule', '/usr/src/server/submodule'),
-  sync('types', '/usr/src/server/types'),
-  sync('package.json', '/usr/src/server/package.json'),
-  sync('package-lock.json', '/usr/src/server/package-lock.json'),
-  run('npm i', trigger='package.json'),
-  run('npm run build')
+  sync('.', '/usr/src/server'),
+  run('npm i', trigger='package.json')
 ], extra_tag='master')
 
 k8s_yaml('./kube/deploy.yml')

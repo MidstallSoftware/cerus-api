@@ -1,4 +1,4 @@
 [submodule "submodules/discord.js"]
 	path = submodules/discord.js
-	url = https://github.com/MidstallSoftware/discord.js
+	url = https://github.com/CerusBots/discord.js
 	branch = v13

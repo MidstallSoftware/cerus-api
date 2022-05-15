@@ -1,6 +1,5 @@
 import { EntityManager } from '@mikro-orm/mariadb'
 import { APIUser } from 'discord-api-types/v9'
-import { auditDatabaseCreateMetric } from '../metrics/audit'
 import { createFetchCache } from '../cache/fetch'
 import User from '../database/entities/user'
 import { DI } from '../di'
@@ -43,16 +42,7 @@ export async function checkUser(token: string): Promise<User> {
           },
         })
 
-    const user = repo.create(new User(self, customer))
-    auditDatabaseCreateMetric
-      .labels({
-        tableName: 'users',
-        id: user.id,
-        value: JSON.stringify(user.toJSON()),
-        editorId: user.id,
-      })
-      .inc()
-    return user
+    return repo.create(new User(self, customer))
   }
   return user
 }

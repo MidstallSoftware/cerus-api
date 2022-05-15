@@ -5,6 +5,7 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core'
+import { ClientEvents } from 'discord.js'
 import { closestIndexTo } from 'date-fns'
 import BaseEntity from '../base'
 import { nowUTC } from '../../utils'
@@ -12,9 +13,9 @@ import Bot from './bot'
 import BotCode from './botcode'
 
 @Entity()
-export default class BotMessage extends BaseEntity {
+export default class BotClientHook extends BaseEntity {
   @Property()
-  regex!: string
+  type!: keyof ClientEvents
 
   @ManyToMany(() => BotCode)
   codes = new Collection<BotCode>(this)

@@ -11,9 +11,7 @@ export async function checkAccessToken(token: string): Promise<AccessToken> {
   })
 
   if (accessToken === null) {
-    return repo.create(
-      new AccessToken(token, await checkUser(token))
-    )
+    return repo.create(new AccessToken(token, await checkUser(token)))
   }
   return accessToken
 }

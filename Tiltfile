@@ -16,8 +16,7 @@ k8s_yaml(secret_from_dict('cerus-secrets', namespace='cerusbots', inputs = {
   'MYSQL_PASSWORD': os.getenv('MYSQL_PASSWORD'),
   'MYSQL_USER': os.getenv('MYSQL_USER'),
   'STRIPE_KEY': os.getenv('STRIPE_KEY'),
-  'SENTRY_LOGGER_DSN': os.getenv('SENTRY_LOGGER_DSN'),
-  'SENTRY_HTTP_DSN': os.getenv('SENTRY_HTTP_DSN')
+  'SENTRY_DSN': os.getenv('SENTRY_DSN')
 }))
 
 helm_repo('bitnami', 'https://charts.bitnami.com/bitnami', labels=['cerus-helm'])

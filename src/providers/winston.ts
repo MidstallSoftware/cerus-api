@@ -84,7 +84,9 @@ const logger = createLogger({
       ? undefined
       : new Sentry({
           sentry: {
+            environment: config.env,
             dsn: process.env.SENTRY_LOGGER_DSN,
+            debug: true,
           },
           level: 'error',
         }),

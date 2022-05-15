@@ -10,6 +10,7 @@ ENV NODE_ENV development
 
 RUN npm config set update-notifier false
 RUN npm install
+RUN npm run build
 
 EXPOSE 80
-ENTRYPOINT [ "dumb-init", "npm", "run", "dev" ]
+ENTRYPOINT [ "dumb-init", "npm", "run", "start" ]

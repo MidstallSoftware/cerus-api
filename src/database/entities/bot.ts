@@ -38,5 +38,15 @@ export default class Bot extends BaseEntity {
   clientHooks = new Collection<BotClientHook>(this)
 
   @OneToOne(() => Team)
-  team!: Team
+  team = new Team(this)
+
+  constructor(token: string, intents?: string[], isPublic?: boolean) {
+    super()
+
+    this.token = token
+
+    if (typeof intents === 'object' && Array.isArray(intents))
+      this.intents = intents
+    if (typeof isPublic === 'boolean') this.isPublic = isPublic
+  }
 }

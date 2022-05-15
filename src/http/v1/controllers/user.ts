@@ -19,6 +19,7 @@ export default function genController(): Record<
 
         if (perm.granted) {
           res.json(new BaseMessage(req.auth.user.transform(), 'user:get'))
+          next()
         } else {
           throw new HttpUnauthorizedError(
             'User does not have permission to retrive user'

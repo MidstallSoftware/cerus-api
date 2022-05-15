@@ -10,5 +10,8 @@ export async function initDatabase() {
     subscribers: [new MetricsSubscriber()],
   })
   winston.info('Connected to database')
+
+  const migrator = orm.getMigrator()
+  await migrator.up()
   return orm
 }

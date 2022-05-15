@@ -4,7 +4,7 @@ import { DI } from '../di'
 import { checkUser } from './user'
 
 export async function checkAccessToken(token: string): Promise<AccessToken> {
-  const em = DI.db.em as EntityManager
+  const em = DI.db.em.fork() as EntityManager
   const repo = em.getRepository(AccessToken)
   const accessToken = await repo.findOne({
     token,

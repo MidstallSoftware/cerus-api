@@ -56,14 +56,15 @@ const caller = format((info) => {
     colno: trace.getColumnNumber(),
   })
 
-  // TODO: if error, provide full stack trace
-  const stack = getStackTrace()
-  const i = stack.findIndex(
-    (v) =>
-      v.getFileName().startsWith(config.buildDir) ||
-      v.getFileName().startsWith(config.sourceDir)
-  )
-  info.source = genSource(stack[i + 4])
+  const stack = getStackTrace().filter((v) => {
+    const fname = v.getFileName()
+    if (typeof fname !== 'string') return false
+    return (
+      fname.startsWith(config.buildDir) || fname.startsWith(config.sourceDir)
+    )
+  })
+  const source = genSource(stack[1])
+  info.message += ` - ${source.file}:${source.lineno}`
   return info
 })
 

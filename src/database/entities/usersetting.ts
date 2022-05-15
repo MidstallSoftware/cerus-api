@@ -24,6 +24,7 @@ export default class UserSetting extends BaseEntity {
   @ManyToOne(() => User, { nullable: false })
   user!: User
 
+  @Property({ persist: false })
   canSet(): boolean {
     if (UserSettingAdminKeys.includes(this.key)) {
       return this.user.type === 'admin'

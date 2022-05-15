@@ -22,6 +22,7 @@ export default class BotMessage extends BaseEntity {
   @ManyToOne(() => Bot, { nullable: false })
   bot!: Bot
 
+  @Property({ persist: false })
   get latestCode() {
     const items = this.codes.getItems()
     const dates = items.map((c) => c.createdAt)

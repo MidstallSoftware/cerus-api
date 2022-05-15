@@ -1,4 +1,10 @@
-import { Collection, Entity, ManyToOne, OneToMany } from '@mikro-orm/core'
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  Property,
+} from '@mikro-orm/core'
 import BaseEntity from '../base'
 import Bot from './bot'
 import TeamMember, { TeamMemberRole } from './teammember'
@@ -11,6 +17,7 @@ export default class Team extends BaseEntity {
   @ManyToOne(() => Bot, { nullable: false })
   bot!: Bot
 
+  @Property({ persist: false })
   get admins() {
     return this.members
       .getItems()

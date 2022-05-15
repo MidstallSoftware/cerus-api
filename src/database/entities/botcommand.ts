@@ -47,6 +47,7 @@ export default class BotCommand extends BaseEntity {
     return json
   }
 
+  @Property({ persist: false })
   get latestCode() {
     const items = this.codes.getItems()
     const dates = items.map((c) => c.createdAt)

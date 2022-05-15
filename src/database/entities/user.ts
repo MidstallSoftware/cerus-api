@@ -44,10 +44,12 @@ export default class User extends BaseEntity {
   @ManyToMany(() => Team)
   teams = new Collection<Team>(this)
 
+  @Property({ persist: false })
   get bots() {
     return this.teams.getItems().map((v) => v.bot)
   }
 
+  @Property({ persist: false })
   get ownedBots() {
     return this.bots.filter(
       (bot) =>
@@ -68,6 +70,7 @@ export default class User extends BaseEntity {
     else this.customerId = customer.id
   }
 
+  @Property({ persist: false })
   getCustomer(): Promise<Stripe.Customer | Stripe.DeletedCustomer> {
     return DI.stripe.customers.retrieve(this.customerId)
   }

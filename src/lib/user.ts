@@ -1,26 +1,19 @@
 import { EntityManager } from '@mikro-orm/mariadb'
 import { APIUser } from 'discord-api-types/v9'
-import { createFetchCache } from '../cache/fetch'
+import fetch from 'node-fetch'
 import User from '../database/entities/user'
 import { DI } from '../di'
 
 export async function checkUser(token: string): Promise<User> {
-  const cache = createFetchCache(
-    'https://discord.com/api/users/@me',
-    {
-      headers: {
-        Authorization: token,
-      },
+  const resp = await fetch('https://discord.com/api/users/@me', {
+    headers: {
+      Authorization: token,
     },
-    {
-      expires: 24 * 60 * 60,
-    }
-  )
+  })
 
-  const resp = await cache.read()
   const self = (await resp.json()) as APIUser
 
-  const em = DI.db.em as EntityManager
+  const em = DI.db.em.fork() as EntityManager
   const repo = em.getRepository(User)
 
   const user = await repo.findOne({

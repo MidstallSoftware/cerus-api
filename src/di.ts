@@ -17,7 +17,7 @@ export const DI = {} as {
   db: MikroORM
   kafka: Kafka
   mail: Transporter<SMTPSentMessageInfo>
-  stripe: Stripe
+  stripe?: Stripe
   serverStart: Date
 }
 
@@ -36,10 +36,12 @@ export async function init() {
   DI.cache = initCache()
   DI.db = await initDatabase()
   DI.mail = await initMail()
-  DI.stripe = new Stripe(process.env.STRIPE_KEY as string, {
-    apiVersion: '2020-08-27',
-    typescript: true,
-  })
+  DI.stripe = config.disabled.stripe
+    ? undefined
+    : new Stripe(process.env.STRIPE_KEY as string, {
+        apiVersion: '2020-08-27',
+        typescript: true,
+      })
 
   DI.serverStart = utcToZonedTime(new Date().toUTCString(), config.timezone)
   Prometheus.collectDefaultMetrics({ prefix: 'cerus_api_' })

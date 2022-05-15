@@ -21,21 +21,28 @@ export async function checkUser(token: string): Promise<User> {
   })
 
   if (user === null) {
-    const customers = await DI.stripe.customers.list({
-      email: self.email as string,
-    })
-
-    const customer = customers.data[0]
-      ? customers.data[0]
-      : await DI.stripe.customers.create({
+    const getCustomer = async () => {
+      if (typeof DI.stripe === 'object') {
+        const customers = await DI.stripe.customers.list({
           email: self.email as string,
-          name: `${self.username}#${self.discriminator}`,
-          metadata: {
-            discordId: self.id,
-          },
         })
 
-    return repo.create(new User(self, customer))
+        return customers.data[0]
+          ? customers.data[0]
+          : await DI.stripe.customers.create({
+              email: self.email as string,
+              name: `${self.username}#${self.discriminator}`,
+              metadata: {
+                discordId: self.id,
+              },
+            })
+      }
+      return undefined
+    }
+
+    const user = repo.create(new User(self, await getCustomer()))
+    await em.persistAndFlush(user)
+    return user
   }
   return user
 }

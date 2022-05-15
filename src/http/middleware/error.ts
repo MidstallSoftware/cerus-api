@@ -18,7 +18,7 @@ export function errorHandler(
   next: NextFunction
 ) {
   if (!res.headersSent) {
-    const response: Record<string, any> = {
+    const response: Record<string, number | string | string[]> = {
       status: 500,
       detail: 'Internal server error',
     }
@@ -31,7 +31,7 @@ export function errorHandler(
         response.trace = err.stack.split('\n')
     }
 
-    res.status(response.status).json(response)
+    res.status(response.status as number).json(response)
   }
   next()
 }

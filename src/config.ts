@@ -23,9 +23,18 @@ interface Config {
   prometheus: {
     host: string
   }
+  disabled: {
+    stripe: boolean
+    sentry: boolean
+  }
   logLevels: Record<string, string>
   timezone: string
 }
+
+const parseEnvbool = (v: string | undefined, def = false) =>
+  typeof v === 'undefined'
+    ? def
+    : v.toLowerCase() === '1' || v.toLowerCase() === 'true'
 
 const config: Config = {
   buildDir: join(__dirname, '..', 'dist'),
@@ -33,6 +42,10 @@ const config: Config = {
   dataDir: join(__dirname, '..', 'data'),
   env,
   production,
+  disabled: {
+    stripe: parseEnvbool(process.env.DISABLE_STRIPE),
+    sentry: parseEnvbool(process.env.DISABLE_SENTRY),
+  },
   port: parseInt(process.env.PORT || '80'),
   mail: {
     host: process.env.EMAIL_HOST,

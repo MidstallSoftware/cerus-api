@@ -25,8 +25,8 @@ export default class User extends BaseEntity {
   @Property()
   discordId!: string
 
-  @Property({ nullable: false, unique: true })
-  customerId!: string
+  @Property({ nullable: true, unique: true })
+  customerId?: string
 
   @Property({ nullable: false, default: false })
   isBanned!: boolean
@@ -59,7 +59,7 @@ export default class User extends BaseEntity {
 
   constructor(
     discord: string | DiscordUser,
-    customer: string | Stripe.Customer
+    customer?: string | Stripe.Customer
   ) {
     super()
 
@@ -67,11 +67,16 @@ export default class User extends BaseEntity {
     else this.discordId = discord.id
 
     if (typeof customer === 'string') this.customerId = customer
-    else this.customerId = customer.id
+    else if (typeof customer === 'object') this.customerId = customer.id
   }
 
   @Property({ persist: false })
   getCustomer(): Promise<Stripe.Customer | Stripe.DeletedCustomer> {
+    if (typeof DI.stripe !== 'object')
+      return Promise.reject('Stripe is not enabled')
+    if (typeof this.customerId !== 'string')
+      return Promise.reject('Customer is not set')
+
     return DI.stripe.customers.retrieve(this.customerId)
   }
 

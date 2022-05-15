@@ -1,5 +1,6 @@
 import { createLogger, format, transports } from 'winston'
 import TransportStream from 'winston-transport'
+import Sentry from 'winston-transport-sentry-node'
 import { StackFrame, get as getStackTrace } from 'stack-trace'
 import config from '../config'
 import { DI } from '../di'
@@ -12,7 +13,7 @@ class KafkaTransport extends TransportStream {
     super(opts)
   }
 
-  log(info: any, next: () => void) {
+  log(info: object, next: () => void) {
     this.getProducer()
       .then((producer) => {
         if (typeof producer === 'object') {
@@ -76,6 +77,17 @@ const logger = createLogger({
     format.splat(),
     format.simple()
   ),
-  transports: [new transports.Console(), new KafkaTransport()],
+  transports: [
+    new transports.Console(),
+    new KafkaTransport(),
+    config.disabled.sentry
+      ? undefined
+      : new Sentry({
+          sentry: {
+            dsn: process.env.SENTRY_LOGGER_DSN,
+          },
+          level: 'error',
+        }),
+  ].filter((v) => typeof v !== 'undefined') as TransportStream[],
 })
 export default logger

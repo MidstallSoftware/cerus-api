@@ -7,7 +7,7 @@ type GetDataFunction = (req: Request) => object
 const validateRequest = (getData: GetDataFunction) => (schema: Schema) => {
   return function notFoundHandler(
     req: Request,
-    _res: Response,
+    _res: Response | null,
     next: NextFunction
   ) {
     const v = validate(getData(req), schema)

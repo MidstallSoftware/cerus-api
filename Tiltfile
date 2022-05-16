@@ -19,8 +19,23 @@ k8s_yaml(secret_from_dict('cerus-secrets', namespace='cerusbots', inputs = {
   'SENTRY_DSN': os.getenv('SENTRY_DSN')
 }))
 
+k8s_yaml(secret_from_dict('grafana-datasources', namespace='cerusbots', inputs = {
+  'datasources.yml': '\n'.join([
+      'apiVersion: 1',
+      'datasources:',
+      ' - name: Prometheus',
+      '   type: prometheus',
+      '   orgId: 1',
+      '   url: http://prometheus-kube-prometheus-prometheus.cerusbots.svc.cluster.local:9090',
+      '   basicAuth: false',
+      '   isDefault: true',
+      '   editable: false'
+    ])
+}))
+
 helm_repo('bitnami', 'https://charts.bitnami.com/bitnami', labels=['cerus-helm'])
 helm_repo('cloudhut', 'https://raw.githubusercontent.com/cloudhut/charts/master/archives', labels=['cerus-helm'])
+helm_repo('cetic', 'https://cetic.github.io/helm-charts', labels=['cerus-helm'])
 
 helm_resource('redis', 'bitnami/redis', namespace='cerusbots', labels=['cerus-backend'], flags=[
   '--set', 'auth.existingSecret=cerus-secrets',
@@ -49,7 +64,8 @@ helm_resource('prometheus', 'bitnami/kube-prometheus', namespace='cerusbots', la
 k8s_resource('prometheus', port_forwards='8080:9090')
 
 helm_resource('grafana', 'bitnami/grafana', namespace='cerusbots', labels=['cerus-monitoring'], flags=[
-  '--set', 'service.type=LoadBalancer'
+  '--set', 'service.type=LoadBalancer',
+  '--set', 'datasources.secretName=grafana-datasources'
 ])
 k8s_resource('grafana', port_forwards='8081:3000')
 
@@ -58,8 +74,14 @@ helm_resource('kowl', 'cloudhut/kowl', namespace='cerusbots', labels=['cerus-mon
 ])
 k8s_resource('kowl', port_forwards='8082:8080')
 
+helm_resource('adminer', 'cetic/adminer', namespace='cerusbots', labels=['cerus-monitoring'], flags=[
+  '--set', 'config.design=dracula',
+  '--set', 'config.externalserver=mariadb'
+])
+k8s_resource('adminer', port_forwards=['8083:8080'])
+
 deployment_create('mailhog', 'mailhog/mailhog', namespace='cerusbots', ports=['8025:8025', '1025:1025'])
-k8s_resource('mailhog', labels=['cerus-monitoring'], port_forwards=['8083:8025'])
+k8s_resource('mailhog', labels=['cerus-monitoring'], port_forwards=['8084:8025'])
 
 docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'npm run start', dockerfile='./Dockerfile.dev', live_update=[
   sync('data', '/usr/src/server/data'),

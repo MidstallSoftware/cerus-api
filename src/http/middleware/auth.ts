@@ -11,7 +11,7 @@ export function authHandler(opts?: AuthHandlerOptions) {
   opts = deepmerge(opts || {}, {
     required: true,
   })
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response | null, next: NextFunction) => {
     const header = req.headers.authorization
 
     if (typeof header === 'undefined' && opts?.required) {

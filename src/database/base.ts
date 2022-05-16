@@ -2,10 +2,12 @@ import {
   PrimaryKey,
   Property,
   BaseEntity as MOBaseEntity,
+  Entity,
 } from '@mikro-orm/core'
 import { APIObject } from '../http/types'
 import { nowUTC } from '../utils'
 
+@Entity({ abstract: true })
 export default class BaseEntity extends MOBaseEntity<BaseEntity, 'id'> {
   @PrimaryKey()
   id!: number

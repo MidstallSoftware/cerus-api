@@ -1,6 +1,5 @@
 import express from 'express'
 import expressWS from 'express-ws'
-import config from '../config'
 import { errorHandler, notFoundHandler } from './middleware/error'
 import v1 from './v1'
 import logger from './middleware/logger'

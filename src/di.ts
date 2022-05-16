@@ -1,6 +1,7 @@
 import { MikroORM } from '@mikro-orm/core'
 import { Kafka } from 'kafkajs'
 import Prometheus from 'prom-client'
+import { PrometheusDriver } from 'prometheus-query'
 import { utcToZonedTime } from 'date-fns-tz'
 import { SentMessageInfo as SMTPSentMessageInfo } from 'nodemailer/lib/smtp-transport'
 import { Transporter } from 'nodemailer'
@@ -17,6 +18,7 @@ export const DI = {} as {
   db: MikroORM
   kafka: Kafka
   mail: Transporter<SMTPSentMessageInfo>
+  prometheus: PrometheusDriver
   stripe?: Stripe
   serverStart: Date
 }
@@ -28,6 +30,7 @@ export async function init() {
         config.production ? `tcp:${config.db.host}:${config.db.port}` : false,
         `tcp:${config.mail.host}:${config.mail.port}`,
         `tcp:${config.cache.host}:${config.cache.port}`,
+        `tcp:${config.prometheus.host}:9090`,
       ].filter((v) => v !== false) as string[],
     })
   }
@@ -36,6 +39,10 @@ export async function init() {
   DI.cache = initCache()
   DI.db = await initDatabase()
   DI.mail = await initMail()
+  DI.prometheus = new PrometheusDriver({
+    endpoint: `http://${config.prometheus.host}:9090`,
+    baseURL: '/api/v1',
+  })
   DI.stripe = config.disabled.stripe
     ? undefined
     : new Stripe(process.env.STRIPE_KEY as string, {

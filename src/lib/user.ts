@@ -3,6 +3,7 @@ import { APIUser } from 'discord-api-types/v9'
 import fetch from 'node-fetch'
 import User from '../database/entities/user'
 import { DI } from '../di'
+import { usersJoinCounter } from '../metrics/user'
 
 export async function checkUser(token: string): Promise<User> {
   const resp = await fetch('https://discord.com/api/users/@me', {
@@ -14,9 +15,8 @@ export async function checkUser(token: string): Promise<User> {
   const self = (await resp.json()) as APIUser
 
   const em = DI.db.em.fork() as EntityManager
-  const repo = em.getRepository(User)
 
-  const user = await repo.findOne({
+  const user = await em.findOne(User, {
     discordId: self.id,
   })
 
@@ -40,9 +40,11 @@ export async function checkUser(token: string): Promise<User> {
       return undefined
     }
 
-    const user = repo.create(new User(self, await getCustomer()))
+    const user = new User(self, await getCustomer())
+    usersJoinCounter.inc({ discordId: self.id })
     await em.persistAndFlush(user)
     return user
   }
+
   return user
 }

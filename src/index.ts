@@ -1,4 +1,6 @@
+import 'source-map-support/register'
 import 'reflect-metadata'
+
 import makeApp from './http'
 import { init } from './di'
 import winston from './providers/winston'

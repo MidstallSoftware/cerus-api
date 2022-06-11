@@ -21,6 +21,10 @@ spec:
           name: cerus-api
           ports:
             - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /v1/service/stats
+              port: 80
           envFrom:
             - secretRef:
                 name: cerus-secrets

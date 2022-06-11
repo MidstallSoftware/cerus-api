@@ -1,6 +1,5 @@
 import { createLogger, format, transports } from 'winston'
 import TransportStream from 'winston-transport'
-import Sentry from 'winston-transport-sentry-node'
 import { StackFrame, get as getStackTrace } from 'stack-trace'
 import { readFileSync } from 'fs'
 import { SourceMapConsumer } from 'source-map-js'
@@ -91,19 +90,6 @@ const logger = createLogger({
     format.splat(),
     format.simple()
   ),
-  transports: [
-    new transports.Console(),
-    new KafkaTransport(),
-    config.disabled.sentry
-      ? undefined
-      : new Sentry({
-          sentry: {
-            environment: config.env,
-            dsn: process.env.SENTRY_LOGGER_DSN,
-            debug: true,
-          },
-          level: 'error',
-        }),
-  ].filter((v) => typeof v !== 'undefined') as TransportStream[],
+  transports: [new transports.Console(), new KafkaTransport()],
 })
 export default logger

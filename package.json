@@ -52,6 +52,7 @@
     "prom-client": "^14.0.1",
     "prometheus-query": "^3.2.3",
     "reflect-metadata": "^0.1.13",
+    "server-timing": "^3.3.2",
     "source-map-js": "^1.0.2",
     "source-map-support": "^0.5.21",
     "stack-trace": "^0.0.10",

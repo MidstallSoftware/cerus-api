@@ -1,5 +1,6 @@
 import express from 'express'
 import expressWS from 'express-ws'
+import serverTiming from 'server-timing'
 import { errorHandler, notFoundHandler } from './middleware/error'
 import v1 from './v1'
 import logger from './middleware/logger'
@@ -9,6 +10,7 @@ export default function () {
   const app = express()
   const websocket = expressWS(app)
 
+  app.use(serverTiming)
   app.use(preMetricHandler)
   app.use(logger)
 

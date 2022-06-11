@@ -13,4 +13,4 @@ RUN npm install
 RUN npm run build
 
 EXPOSE 80
-ENTRYPOINT [ "dumb-init", "npm", "run", "start" ]
+ENTRYPOINT [ "dumb-init", "npm", "run", "dev" ]

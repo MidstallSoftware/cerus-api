@@ -16,6 +16,7 @@ interface Config {
   port: number
   env: EnvType
   production: boolean
+  debug: boolean
   mail: SMTPOptions
   db: DBOptions
   cache: RedisOptions
@@ -42,6 +43,7 @@ const config: Config = {
   dataDir: join(__dirname, '..', 'data'),
   env,
   production,
+  debug: !production,
   disabled: {
     stripe: parseEnvbool(process.env.DISABLE_STRIPE),
     sentry: parseEnvbool(process.env.DISABLE_SENTRY),

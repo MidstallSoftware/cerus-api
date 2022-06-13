@@ -1,6 +1,5 @@
 import deepmerge from 'deepmerge'
 import { Request, Response, NextFunction } from 'express'
-import { resolve } from 'path'
 import { checkAccessToken } from '../../lib/accesstoken'
 import { HttpUnauthorizedError } from '../exceptions'
 

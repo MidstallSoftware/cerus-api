@@ -7,7 +7,7 @@ import User from '../../../database/entities/user'
 import { DI } from '../../../di'
 import config from '../../../config'
 import { HttpUnauthorizedError } from '../../exceptions'
-import { BaseMessage } from '../../message'
+import { BaseMessage } from '@cerusbots/common/dist/http/message'
 import ac from '../../../rbac/sys'
 
 export default function genController() {
@@ -40,22 +40,6 @@ export default function genController() {
             }
 
             res.status(resp.status).send(buff.toString('ascii'))
-            console.log({
-              fetchResp: {
-                status: resp.status,
-                body: buff.toString('ascii'),
-                headers: resp.headers.raw(),
-              },
-              res,
-              req: {
-                method: req.method,
-                body: req.body,
-                headers: req.headers,
-                query: req.query,
-                params: req.params,
-                url: req.originalUrl,
-              },
-            })
             next()
           })
           .catch((e) => next(e))

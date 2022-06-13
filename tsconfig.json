@@ -24,5 +24,8 @@
     }
   },
   "exclude": ["node_modules/*"],
-  "include": ["src", "types"]
+  "include": ["src", "types"],
+  "ts-node": {
+    "files": true
+  }
 }

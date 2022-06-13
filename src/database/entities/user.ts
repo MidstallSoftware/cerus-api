@@ -8,7 +8,7 @@ import {
 } from '@mikro-orm/core'
 import { APIUser as DiscordUser } from 'discord-api-types/v9'
 import Stripe from 'stripe'
-import { APIUser } from '../../http/types'
+import { APIUser } from '@cerusbots/common/dist/http/types'
 import { DI } from '../../di'
 import BaseEntity from '../base'
 import AccessToken from './accesstoken'

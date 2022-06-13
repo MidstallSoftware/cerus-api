@@ -4,7 +4,7 @@ import {
   BaseEntity as MOBaseEntity,
   Entity,
 } from '@mikro-orm/core'
-import { APIObject } from '../http/types'
+import { APIObject } from '@cerusbots/common/dist/http/types'
 import { nowUTC } from '../utils'
 
 @Entity({ abstract: true })

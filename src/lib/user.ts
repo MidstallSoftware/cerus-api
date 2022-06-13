@@ -12,7 +12,13 @@ export async function checkUser(token: string): Promise<User> {
     },
   })
 
-  const self = (await resp.json()) as APIUser
+  const self = (await resp.json()) as
+    | APIUser
+    | { message: string; code: number }
+
+  if (!('id' in self)) {
+    throw new Error(self.message)
+  }
 
   const em = DI.db.em.fork() as EntityManager
 

@@ -1,6 +1,7 @@
 import express from 'express'
 import expressWS from 'express-ws'
 import serverTiming from 'server-timing'
+import cors from 'cors'
 import * as Sentry from '@sentry/node'
 import config from '../config'
 import { errorHandler, notFoundHandler } from './middleware/error'
@@ -11,6 +12,8 @@ import { postMetricHandler, preMetricHandler } from './middleware/metrics'
 export default function () {
   const app = express()
   const websocket = expressWS(app)
+
+  app.use(cors())
 
   if (!config.disabled.sentry) {
     Sentry.init({

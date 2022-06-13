@@ -4,8 +4,8 @@ import { expressCacheRoute } from '../cache/http'
 import User from '../database/entities/user'
 import BaseEntity from '../database/base'
 import { DI } from '../di'
-import { BaseMessage } from './message'
-import { APIList, APIObject } from './types'
+import { BaseMessage } from '@cerusbots/common/dist/http/message'
+import { APIList, APIObject } from '@cerusbots/common/dist/http/types'
 
 export function createDatabaseRouter<V extends APIObject>(
   obj: typeof BaseEntity,

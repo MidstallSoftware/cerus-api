@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { BaseMessage } from '../http/message'
+import { BaseMessage } from '@cerusbots/common/dist/http/message'
 import { readCacher } from './base'
 
 export function expressCacheRoute(

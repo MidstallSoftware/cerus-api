@@ -2,3 +2,6 @@
 	path = submodules/discord.js
 	url = https://github.com/CerusBots/discord.js
 	branch = v13
+[submodule "submodules/common"]
+	path = submodules/common
+	url = https://github.com/CerusBots/common/

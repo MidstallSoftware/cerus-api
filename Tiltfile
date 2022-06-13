@@ -83,7 +83,7 @@ k8s_resource('adminer', port_forwards=['8083:8080'])
 deployment_create('mailhog', 'mailhog/mailhog', namespace='cerusbots', ports=['8025:8025', '1025:1025'])
 k8s_resource('mailhog', labels=['cerus-monitoring'], port_forwards=['8084:8025'])
 
-docker_build_with_restart('ghcr.io/cerusbots/api', '.', 'npm run start', dockerfile='./Dockerfile.dev', live_update=[
+docker_build('ghcr.io/cerusbots/api', '.', dockerfile='./Dockerfile.dev', live_update=[
   sync('data', '/usr/src/server/data'),
   sync('patches', '/usr/src/server/patches'),
   sync('src', '/usr/src/server/src'),

@@ -40,6 +40,7 @@ export default function genController(): Record<
                     discordID: discordUser.id,
                     username: discordUser.username,
                     discriminator: discordUser.discriminator,
+                    avatarHash: discordUser.avatar,
                   },
                   'user:get'
                 )

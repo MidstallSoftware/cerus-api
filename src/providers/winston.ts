@@ -67,6 +67,11 @@ const caller = format((info) => {
   })
 
   const source = genSource(stack[1])
+  if (process.env.TS_NODE_DEV) {
+    info.message = `${source.file}:${source.lineno}.${source.colno}: ${info.message}`
+    return info
+  }
+
   const consumer = new SourceMapConsumer(
     JSON.parse(readFileSync(source.file + '.map', 'utf8'))
   )

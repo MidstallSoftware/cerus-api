@@ -1,4 +1,8 @@
-import 'source-map-support/register'
+import { install } from 'source-map-support'
+if (!process.env.TS_NODE_DEV) {
+  install()
+}
+
 import 'reflect-metadata'
 
 import makeApp from './http'

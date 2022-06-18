@@ -1,9 +1,8 @@
-import { formatISO } from 'date-fns'
-import { utcToZonedTime, toDate, zonedTimeToUtc } from 'date-fns-tz'
+import { utcToZonedTime } from 'date-fns-tz'
 import config from './config'
 
 export function nowUTC(): Date {
-  return zonedTimeToUtc(new Date(), 'Etc/UTC')
+  return utcToZonedTime(new Date(), 'Etc/UTC')
 }
 
 export function nowLocal(): Date {

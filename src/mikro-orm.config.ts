@@ -57,6 +57,7 @@ const mikroOrmConfig: Options = {
       client: new Redis(config.cache),
     },
   },
+  forceUtcTimezone: true,
   baseDir: join(config.buildDir, '..'),
   loggerFactory: () => new MikroORMWinston(),
   ...config.db,

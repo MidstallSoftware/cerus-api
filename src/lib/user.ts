@@ -52,5 +52,8 @@ export async function checkUser(token: string): Promise<User> {
     return user
   }
 
+  if (user.deletedAt !== null)
+    throw new Error('User was deleted, contact support to reinstate account.')
+
   return user
 }

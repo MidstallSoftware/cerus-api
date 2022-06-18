@@ -2,7 +2,12 @@ import { AccessControl } from 'accesscontrol'
 
 const ac = new AccessControl()
 
-ac.grant('default').readOwn('user').updateOwn('user')
+ac.grant('default')
+  .readOwn('user')
+  .updateOwn('user')
+  .createOwn('bot')
+  .updateOwn('bot')
+  .deleteOwn('bot')
 
 ac.grant('admin')
   .extend('default')

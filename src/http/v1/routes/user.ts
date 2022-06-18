@@ -7,5 +7,6 @@ export default function genUserRoute() {
   const controller = genController()
 
   router.get('/', requireAuthHandler, controller.get)
+  router.delete('/', requireAuthHandler, controller.delete)
   return router
 }

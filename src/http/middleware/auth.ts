@@ -1,18 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../express.d.ts" />
-import deepmerge from 'deepmerge'
 import { Request, Response, NextFunction } from 'express'
 import { checkAccessToken } from '../../lib/accesstoken'
 import { HttpUnauthorizedError } from '../exceptions'
 
 interface AuthHandlerOptions {
-  required?: boolean
+  required: boolean
 }
 
 export function authHandler(opts?: AuthHandlerOptions) {
-  opts = deepmerge(opts || {}, {
-    required: true,
-  })
+  opts = opts || { required: true }
   return (req: Request, res: Response | null, next: NextFunction) => {
     const header = req.headers.authorization
 
@@ -36,3 +33,4 @@ export function authHandler(opts?: AuthHandlerOptions) {
 }
 
 export const requireAuthHandler = authHandler({ required: true })
+export const tryAuthHandler = authHandler({ required: false })

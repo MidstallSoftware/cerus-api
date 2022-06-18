@@ -87,7 +87,7 @@ const config: Config = {
     development: 'debug',
     production: 'info',
   },
-  timezone: process.env.TZ ?? 'Etc/UTC',
+  timezone: process.env.TZ ?? 'America/Los_Angeles',
 }
 
 export default config

@@ -5,6 +5,9 @@ import {
   OneToOne,
   Property,
 } from '@mikro-orm/core'
+import { APIBot } from '@cerusbots/common/dist/http/types'
+import { APIApplication } from 'discord-api-types/v10'
+import fetch from 'node-fetch'
 import BaseEntity from '../base'
 import BotCommand from './botcommand'
 import BotClientHook from './botclienthook'
@@ -48,5 +51,34 @@ export default class Bot extends BaseEntity {
     if (typeof intents === 'object' && Array.isArray(intents))
       this.intents = intents
     if (typeof isPublic === 'boolean') this.isPublic = isPublic
+  }
+
+  transform(): APIBot {
+    return {
+      ...super.transform(),
+      isPremium: this.isPremium ?? false,
+      isPublic: this.isPublic ?? false,
+      running: this.running,
+      intents: this.intents || [],
+    }
+  }
+
+  async transformRemote(): Promise<APIBot> {
+    const discordAppReq = await fetch(
+      'https://discord.com/api/oauth2/applications/@me',
+      {
+        headers: {
+          Authorization: `Bot ${this.token}`,
+        },
+      }
+    )
+    const discordApp = (await discordAppReq.json()) as APIApplication
+    return {
+      ...this.transform(),
+      name: discordApp.name,
+      description: discordApp.description,
+      discordID: discordApp.id,
+      icon: discordApp.icon ?? undefined,
+    }
   }
 }

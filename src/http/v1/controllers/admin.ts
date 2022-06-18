@@ -35,7 +35,7 @@ export default function genController() {
         })
 
         const kafkaResource = (topic: string) => {
-          ;(async () => {
+          const run = async () => {
             const consumer = DI.kafka.consumer({
               groupId: `admin-event-${req.auth?.user?.id}`,
             })
@@ -49,7 +49,9 @@ export default function genController() {
                 })
               },
             })
-          })().catch((e) => {
+          }
+
+          run().catch((e) => {
             ws.send(JSON.stringify(new BaseMessage(null, e)))
             ws.close()
             next()
@@ -101,7 +103,7 @@ export default function genController() {
 
         switch (resource) {
           case 'database':
-            ;(async () => {
+            const run = async () => {
               const em = DI.db.em.fork() as EntityManager
 
               const [audits, count] = await em.findAndCount(
@@ -131,7 +133,9 @@ export default function genController() {
                   'admin:audit'
                 )
               )
-            })().catch((e) => next(e))
+            }
+
+            run().catch((e) => next(e))
             break
           default:
             next()

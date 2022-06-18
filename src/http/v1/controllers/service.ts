@@ -49,7 +49,7 @@ export default function genController() {
     },
     stats: (req: Request, res: Response, next: NextFunction) => {
       try {
-        ;(async () => {
+        const run = async () => {
           const em = DI.db.em.fork() as EntityManager
 
           const botCount = (
@@ -95,7 +95,9 @@ export default function genController() {
             )
           )
           next()
-        })().catch((e) => next(e))
+        }
+
+        run().catch((e) => next(e))
       } catch (e) {
         next(e)
       }

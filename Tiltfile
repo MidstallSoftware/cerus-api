@@ -3,7 +3,7 @@ load('ext://dotenv', 'dotenv')
 
 dotenv()
 
-update_settings(k8s_upsert_timeout_secs=240)
+update_settings(k8s_upsert_timeout_secs=600)
 
 docker_build('ghcr.io/cerusbots/api:latest', '.', dockerfile='./Dockerfile.dev', live_update=[
   sync('data', '/usr/src/server/data'),

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import genController from '../controllers/bot'
 import { requireAuthHandler, tryAuthHandler } from '../../middleware/auth'
-import { validateBody, validateQuery } from '~/http/middleware/validate'
+import { validateBody, validateQuery } from '../../middleware/validate'
 import { Intents } from 'discord.js'
 
 export default function genBotRoute() {

@@ -14,6 +14,7 @@ import BaseEntity from '../base'
 import AccessToken from './accesstoken'
 import Team from './team'
 import UserSetting from './usersetting'
+import UserAlert from './useralert'
 
 export enum UserType {
   DEFAULT = 'default',
@@ -40,6 +41,9 @@ export default class User extends BaseEntity {
 
   @OneToMany(() => UserSetting, (userSetting) => userSetting.user)
   settings = new Collection<UserSetting>(this)
+
+  @OneToMany(() => UserAlert, (userAlert) => userAlert.user)
+  alerts = new Collection<UserAlert>(this)
 
   @ManyToMany(() => Team)
   teams = new Collection<Team>(this)

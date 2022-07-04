@@ -8,5 +8,6 @@ stdenv.mkDerivation {
     shellHooks = ''
         export PATH="$PWD/node_modules/.bin/:$PATH"
         alias run="npm run"
+        alias kubectl="minikube kubectl --"
     '';
 }

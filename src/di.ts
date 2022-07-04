@@ -27,13 +27,16 @@ export const DI = {} as {
 
 export async function init() {
   if (config.env !== 'testing') {
+    const resources = [
+      config.production ? `tcp:${config.db.host}:${config.db.port}` : false,
+      `tcp:${config.mail.host}:${config.mail.port}`,
+      `tcp:${config.cache.host}:${config.cache.port}`,
+      `tcp:${config.prometheus.host}:9090`,
+      ...(config.kafka.brokers as string[]).map((str) => `tcp:${str}`),
+    ].filter((v) => v !== false) as string[]
+    console.log(resources)
     await waitOn({
-      resources: [
-        config.production ? `tcp:${config.db.host}:${config.db.port}` : false,
-        `tcp:${config.mail.host}:${config.mail.port}`,
-        `tcp:${config.cache.host}:${config.cache.port}`,
-        `tcp:${config.prometheus.host}:9090`,
-      ].filter((v) => v !== false) as string[],
+      resources,
     })
   }
 

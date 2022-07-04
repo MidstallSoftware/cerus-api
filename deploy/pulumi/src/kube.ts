@@ -15,6 +15,8 @@ import * as prometheus from './components/prometheus'
 export function createKube(config: Configuration, provider?: k8s.Provider) {
   if (!config.hasNamespace) namespace(config, provider)
 
+  prometheus.crd(config, provider)
+
   cache.chart(config, provider)
   db.chart(config, provider)
   kafka.chart(config, provider)

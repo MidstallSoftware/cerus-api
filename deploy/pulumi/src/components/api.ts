@@ -10,7 +10,7 @@ export const serviceMonitor = (
     {
       file: 'src/manifest/servicemonitor-cerus-api.yaml',
       transformations: [
-        (obj: any) => {
+        (obj) => {
           obj.metadata.namespace = config.namespace
         },
       ],
@@ -36,6 +36,8 @@ export const secret = (config: Configuration, provider?: k8s.Provider) =>
         REDIS_PASSWORD: config.cache.password,
         SENTRY_DSN: config.sentry.dsn,
         STRIPE_KEY: config.stripe.key,
+        EMAIL_USERNAME: config.mail.username,
+        EMAIL_PASSWORD: config.mail.password,
       },
     },
     { provider }
@@ -68,7 +70,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
             containers: [
               {
                 image: config.image,
-                imagePullPolicy: 'Always',
+                imagePullPolicy: config.dev ? 'IfNotPresent' : 'Always',
                 name: 'cerus-api',
                 ports: [{ containerPort: 80 }],
                 readinessProbe: {
@@ -90,7 +92,13 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                     value: config.kafka.brokers.join(','),
                   },
                   { name: 'MYSQL_HOST', value: 'cerus-api-db' },
-                  { name: 'REDIS_HOST', value: 'cerus-api-cache' },
+                  { name: 'REDIS_HOST', value: 'cerus-api-cache-redis-master' },
+                  { name: 'EMAIL_HOST', value: config.mail.host },
+                  { name: 'EMAIL_PORT', value: config.mail.port.toString() },
+                  {
+                    name: 'PROMETHEUS_HOST',
+                    value: `cerus-prometheus-kube-prometheus-prometheus.${config.namespace}.svc.cluster.local`,
+                  },
                 ],
               },
             ],
@@ -98,7 +106,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
         },
       },
     },
-    { provider }
+    { provider, deleteBeforeReplace: true }
   )
 
 export const service = (config: Configuration, provider?: k8s.Provider) =>

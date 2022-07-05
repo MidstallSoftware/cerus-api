@@ -99,6 +99,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                     name: 'PROMETHEUS_HOST',
                     value: `cerus-prometheus-kube-prom-prometheus.${config.namespace}.svc.cluster.local`,
                   },
+                ],
               },
             ],
           },

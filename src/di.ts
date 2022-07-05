@@ -38,7 +38,7 @@ export async function init() {
     console.log(resources)
     await waitOn({
       resources,
-      log: config.debug
+      log: config.debug,
     })
   }
 

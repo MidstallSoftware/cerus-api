@@ -31,12 +31,14 @@ export async function init() {
       config.production ? `tcp:${config.db.host}:${config.db.port}` : false,
       `tcp:${config.mail.host}:${config.mail.port}`,
       `tcp:${config.cache.host}:${config.cache.port}`,
+      `tcp:${config.db.host}:${config.db.port}`,
       `tcp:${config.prometheus.host}:9090`,
       ...(config.kafka.brokers as string[]).map((str) => `tcp:${str}`),
     ].filter((v) => v !== false) as string[]
     console.log(resources)
     await waitOn({
       resources,
+      log: config.debug
     })
   }
 

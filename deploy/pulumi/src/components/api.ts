@@ -78,28 +78,27 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                     path: '/v1/service/stats',
                     port: 80,
                   },
+                  initialDelaySeconds: 60,
                 },
                 livenessProbe: {
                   httpGet: {
                     path: '/v1/service/stats',
                     port: 80,
                   },
+                  initialDelaySeconds: 60,
                 },
-                envFrom: [{ secretRef: { name: 'cerus-api-secrets' } }],
                 env: [
                   {
                     name: 'KAFKA_BROKERS',
                     value: config.kafka.brokers.join(','),
                   },
-                  { name: 'MYSQL_HOST', value: 'cerus-api-db' },
+                  { name: 'MYSQL_HOST', value: 'cerus-api-db-mariadb' },
                   { name: 'REDIS_HOST', value: 'cerus-api-cache-redis-master' },
-                  { name: 'EMAIL_HOST', value: config.mail.host },
                   { name: 'EMAIL_PORT', value: config.mail.port.toString() },
                   {
                     name: 'PROMETHEUS_HOST',
-                    value: `cerus-prometheus-kube-prometheus-prometheus.${config.namespace}.svc.cluster.local`,
+                    value: `cerus-prometheus-kube-prom-prometheus.${config.namespace}.svc.cluster.local`,
                   },
-                ],
               },
             ],
           },

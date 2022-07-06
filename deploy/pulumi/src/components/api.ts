@@ -73,7 +73,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                 imagePullPolicy: config.dev ? 'IfNotPresent' : 'Always',
                 name: 'cerus-api',
                 ports: [{ containerPort: 80 }],
-                readinessProbe: {
+                /* readinessProbe: {
                   httpGet: {
                     path: '/v1/service/stats',
                     port: 80,
@@ -86,7 +86,8 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                     port: 80,
                   },
                   initialDelaySeconds: 60,
-                },
+                }, */
+                envFrom: [{ secretRef: { name: 'cerus-api-secrets' } }],
                 env: [
                   {
                     name: 'KAFKA_BROKERS',
@@ -95,6 +96,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                   { name: 'MYSQL_HOST', value: 'cerus-api-db-mariadb' },
                   { name: 'REDIS_HOST', value: 'cerus-api-cache-redis-master' },
                   { name: 'EMAIL_PORT', value: config.mail.port.toString() },
+                  { name: 'EMAIL_HOST', value: config.mail.host },
                   {
                     name: 'PROMETHEUS_HOST',
                     value: `cerus-prometheus-kube-prom-prometheus.${config.namespace}.svc.cluster.local`,

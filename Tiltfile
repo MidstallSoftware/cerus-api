@@ -1,7 +1,4 @@
 load('ext://pulumi', 'pulumi_resource')
-load('ext://dotenv', 'dotenv')
-
-dotenv()
 
 update_settings(k8s_upsert_timeout_secs=600)
 
@@ -17,4 +14,4 @@ docker_build('ghcr.io/cerusbots/api:latest', '.', dockerfile='./Dockerfile.dev',
   run('npm run build', trigger='submodules/common')
 ])
 
-pulumi_resource('cerus-api', stack='dev', dir='deploy/pulumi', image_deps=['ghcr.io/cerusbots/api:latest'], image_configs=['image'], labels=['cerus-backend'], port_forwards=['3002:80'])
+pulumi_resource('cerus-api', stack='dev', dir='deploy/pulumi', image_deps=['ghcr.io/cerusbots/api:latest'], image_configs=['image'], labels=['cerus'], port_forwards=['3002:80'])

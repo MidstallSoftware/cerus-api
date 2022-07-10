@@ -1,9 +1,11 @@
 import * as k8s from '@pulumi/kubernetes'
+import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from '../config'
 
 export const serviceMonitor = (
   config: Configuration,
-  provider?: k8s.Provider
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
 ) =>
   new k8s.yaml.ConfigFile(
     'cerus-api',
@@ -15,10 +17,17 @@ export const serviceMonitor = (
         },
       ],
     },
-    { provider }
+    {
+      provider,
+      dependsOn,
+    }
   )
 
-export const secret = (config: Configuration, provider?: k8s.Provider) =>
+export const secret = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
   new k8s.core.v1.Secret(
     'cerus-api-secrets',
     {
@@ -40,10 +49,14 @@ export const secret = (config: Configuration, provider?: k8s.Provider) =>
         EMAIL_PASSWORD: config.mail.password,
       },
     },
-    { provider }
+    { provider, dependsOn }
   )
 
-export const deployment = (config: Configuration, provider?: k8s.Provider) =>
+export const deployment = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
   new k8s.apps.v1.Deployment(
     'cerus-api',
     {
@@ -55,6 +68,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
         namespace: config.namespace,
       },
       spec: {
+        replicas: 1,
         selector: {
           matchLabels: {
             app: 'cerus-api',
@@ -73,7 +87,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                 imagePullPolicy: config.dev ? 'IfNotPresent' : 'Always',
                 name: 'cerus-api',
                 ports: [{ containerPort: 80 }],
-                /* readinessProbe: {
+                readinessProbe: {
                   httpGet: {
                     path: '/v1/service/stats',
                     port: 80,
@@ -86,7 +100,7 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
                     port: 80,
                   },
                   initialDelaySeconds: 60,
-                }, */
+                },
                 envFrom: [{ secretRef: { name: 'cerus-api-secrets' } }],
                 env: [
                   {
@@ -108,10 +122,14 @@ export const deployment = (config: Configuration, provider?: k8s.Provider) =>
         },
       },
     },
-    { provider, deleteBeforeReplace: true }
+    { provider, dependsOn }
   )
 
-export const service = (config: Configuration, provider?: k8s.Provider) =>
+export const service = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
   new k8s.core.v1.Service(
     'cerus-api',
     {
@@ -130,5 +148,24 @@ export const service = (config: Configuration, provider?: k8s.Provider) =>
         },
       },
     },
-    { provider }
+    {
+      dependsOn,
+      provider,
+    }
   )
+
+export default function api(
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) {
+  dependsOn = dependsOn || []
+  const secretRes = secret(config, provider, dependsOn)
+  const deploymentRes = deployment(config, provider, [...dependsOn, secretRes])
+  const serviceRes = service(config, provider, [...dependsOn, deploymentRes])
+  const serviceMonitorRes = serviceMonitor(config, provider, [
+    ...dependsOn,
+    serviceRes,
+  ])
+  return [secretRes, deploymentRes, serviceRes, serviceMonitorRes]
+}

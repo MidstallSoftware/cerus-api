@@ -1,72 +1,37 @@
 import * as k8s from '@pulumi/kubernetes'
+import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from '../config'
 
-export const deployment = (config: Configuration, provider?: k8s.Provider) =>
-  new k8s.apps.v1.Deployment(
+export const release = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new k8s.helm.v3.Release(
     'cerus-mailhog',
     {
-      metadata: {
-        labels: {
-          app: 'cerus-mailhog',
-        },
-        name: 'cerus-mailhog',
-        namespace: config.namespace,
+      name: 'cerus-mailhog',
+      chart: 'mailhog',
+      namespace: config.namespace,
+      repositoryOpts: {
+        repo: 'https://codecentric.github.io/helm-charts',
       },
-      spec: {
-        selector: {
-          matchLabels: {
-            app: 'cerus-mailhog',
-          },
-        },
-        template: {
-          metadata: {
-            labels: {
-              app: 'cerus-mailhog',
-            },
-          },
-          spec: {
-            containers: [
-              {
-                name: 'mailhog',
-                image: 'mailhog/mailhog',
-                imagePullPolicy: 'Always',
-                ports: [
-                  {
-                    name: 'http',
-                    containerPort: 8025,
-                  },
-                  { name: 'smtp', containerPort: 1025 },
-                ],
-              },
-            ],
+      values: {
+        service: {
+          port: {
+            http: 8025,
+            smtp: 1025,
           },
         },
       },
     },
-    { provider }
+    { provider, dependsOn }
   )
 
-export const service = (config: Configuration, provider?: k8s.Provider) =>
-  new k8s.core.v1.Service(
-    'cerus-mailhog',
-    {
-      metadata: {
-        labels: {
-          app: 'cerus-mailhog',
-        },
-        name: 'cerus-mailhog',
-        namespace: config.namespace,
-      },
-      spec: {
-        clusterIP: 'None',
-        ports: [
-          { port: 8025, name: 'http' },
-          { port: 1025, name: 'smtp' },
-        ],
-        selector: {
-          app: 'cerus-mailhog',
-        },
-      },
-    },
-    { provider }
-  )
+export default function mailhog(
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) {
+  return [release(config, provider, dependsOn)]
+}

@@ -1,7 +1,12 @@
 import * as k8s from '@pulumi/kubernetes'
+import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from '../config'
 
-export const dataSources = (config: Configuration, provider?: k8s.Provider) =>
+export const dataSources = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
   new k8s.core.v1.Secret(
     'cerus-grafana-datasources',
     {
@@ -23,24 +28,26 @@ export const dataSources = (config: Configuration, provider?: k8s.Provider) =>
         ].join('\n'),
       },
     },
-    { provider }
+    { provider, dependsOn }
   )
 
-export const chart = (config: Configuration, provider?: k8s.Provider) =>
-  new k8s.helm.v3.Chart(
+export const release = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new k8s.helm.v3.Release(
     'cerus-grafana',
     {
+      name: 'cerus-grafana',
       chart: 'grafana',
       namespace: config.namespace,
-      fetchOpts: {
+      repositoryOpts: {
         repo: 'https://charts.bitnami.com/bitnami',
       },
       values: {
         global: {
           storageClass: config.grafana.storage.class,
-        },
-        service: {
-          type: 'LoadBalancer',
         },
         persistence: {
           size: config.grafana.storage.size,
@@ -50,5 +57,16 @@ export const chart = (config: Configuration, provider?: k8s.Provider) =>
         },
       },
     },
-    { provider }
+    { provider, dependsOn }
   )
+
+export default function grafana(
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) {
+  dependsOn = dependsOn || []
+  const dataSourcesRes = dataSources(config, provider, dependsOn)
+  const chartRes = release(config, provider, [...dependsOn, dataSourcesRes])
+  return [dataSourcesRes, chartRes]
+}

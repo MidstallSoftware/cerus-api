@@ -1,28 +1,19 @@
 import * as k8s from '@pulumi/kubernetes'
+import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from '../config'
 
-export const crd = (config: Configuration, provider?: k8s.Provider) =>
-  new k8s.yaml.ConfigGroup('cerus-prometheus-crd', {
-    files: [
-      'src/manifest/customresourcedefinition-default-alertmanagerconfigs.monitoring.coreos.com.yaml',
-      'src/manifest/customresourcedefinition-default-alertmanagers.monitoring.coreos.com.yaml',
-      'src/manifest/customresourcedefinition-default-podmonitors.monitoring.coreos.com.yaml',
-      'src/manifest/customresourcedefinition-default-probes.monitoring.coreos.com.yaml',
-      'src/manifest/customresourcedefinition-default-prometheuses.monitoring.coreos.com.yaml',
-      'src/manifest/customresourcedefinition-default-prometheusrules.monitoring.coreos.com.yaml',
-      'src/manifest/customresourcedefinition-default-servicemonitors.monitoring.coreos.com.yaml',
-      'src/manifest/customresourcedefinition-default-thanosrulers.monitoring.coreos.com.yaml',
-    ],
-  })
-
-export const chart = (config: Configuration, provider?: k8s.Provider) =>
-  new k8s.helm.v3.Chart(
+export const release = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new k8s.helm.v3.Release(
     'cerus-prometheus',
     {
+      name: 'cerus-prometheus',
       chart: 'kube-prometheus',
       namespace: config.namespace,
-      skipCRDRendering: true,
-      fetchOpts: {
+      repositoryOpts: {
         repo: 'https://charts.bitnami.com/bitnami',
       },
       values: {
@@ -33,13 +24,14 @@ export const chart = (config: Configuration, provider?: k8s.Provider) =>
           enabled: true,
         },
       },
-      transformations: [
-        (obj, opts) => {
-          if (obj.kind === 'CustomResourceDefinition') {
-            obj.metadata.annotations = {}
-          }
-        },
-      ],
     },
-    { provider }
+    { provider, dependsOn }
   )
+
+export default function prometheus(
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) {
+  return [release(config, provider, dependsOn)]
+}

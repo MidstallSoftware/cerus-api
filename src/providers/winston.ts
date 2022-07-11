@@ -1,3 +1,4 @@
+import { hostname } from 'os'
 import { createLogger, format, transports } from 'winston'
 import TransportStream from 'winston-transport'
 import { StackFrame, get as getStackTrace } from 'stack-trace'
@@ -20,8 +21,8 @@ class KafkaTransport extends TransportStream {
         if (typeof producer === 'object') {
           producer
             .send({
-              topic: 'cerus-logger',
-              messages: [{ value: JSON.stringify(info) }],
+              topic: 'cerus-api-log',
+              messages: [{ value: JSON.stringify(info), key: hostname() }],
               compression: CompressionTypes.GZIP,
             })
             .then(() => next())

@@ -27,16 +27,14 @@ export const DI = {} as {
 
 export async function init() {
   if (config.env !== 'testing') {
-    const resources = [
-      `tcp:${config.db.host}:${config.db.port}`,
-      `tcp:${config.mail.host}:${config.mail.port}`,
-      `tcp:${config.cache.host}:${config.cache.port}`,
-      `tcp:${config.prometheus.host}:9090`,
-      ...(config.kafka.brokers as string[]).map((str) => `tcp:${str}`),
-    ]
-    console.log(resources)
     await waitOn({
-      resources,
+      resources: [
+        `tcp:${config.db.host}:${config.db.port}`,
+        `tcp:${config.mail.host}:${config.mail.port}`,
+        `tcp:${config.cache.host}:${config.cache.port}`,
+        `tcp:${config.prometheus.host}:9090`,
+        ...(config.kafka.brokers as string[]).map((str) => `tcp:${str}`),
+      ],
       log: config.debug,
     })
   }

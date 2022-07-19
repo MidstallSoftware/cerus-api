@@ -1,13 +1,16 @@
 import { Options as DBOptions } from '@mikro-orm/core'
+import { auth } from 'express-oauth2-jwt-bearer'
 import { Options as SMTPOptions } from 'nodemailer/lib/smtp-transport'
 import { join } from 'path'
 import { RedisOptions } from 'ioredis'
 import { KafkaConfig } from 'kafkajs'
+import { hostname } from 'os'
 
 type EnvType = 'production' | 'development' | 'testing' | 'none'
 
 const env = (process.env.NODE_ENV ?? 'development') as EnvType
 const production = env === 'production'
+const domain = process.env.DOMAIN || hostname()
 
 interface Config {
   buildDir: string
@@ -17,10 +20,12 @@ interface Config {
   env: EnvType
   production: boolean
   debug: boolean
+  domain: string
   mail: SMTPOptions
   db: DBOptions
   cache: RedisOptions
   kafka: KafkaConfig
+  auth0: Parameters<typeof auth>[0]
   prometheus: {
     host: string
   }
@@ -44,11 +49,16 @@ const config: Config = {
   env,
   production,
   debug: !production,
+  domain,
   disabled: {
     stripe: parseEnvbool(process.env.DISABLE_STRIPE),
     sentry: parseEnvbool(process.env.DISABLE_SENTRY),
   },
   port: parseInt(process.env.PORT || '80'),
+  auth0: {
+    audience: `http://${domain}`,
+    issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+  },
   mail: {
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.EMAIL_PORT || '587'),

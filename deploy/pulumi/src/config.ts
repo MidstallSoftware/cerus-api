@@ -12,6 +12,10 @@ export interface Configuration {
   sha: string
   image: string
   hasNamespace: boolean
+  domain: string
+  auth0: {
+    issuerBaseURL: string
+  }
   db: {
     password: string | Output<string>
     username: string
@@ -86,6 +90,10 @@ export function createConfig(config: Config): Configuration {
     sha,
     image: '',
     hasNamespace,
+    domain: `api.${domain}`,
+    auth0: {
+      issuerBaseURL: config.require('auth0.issuerBaseURL'),
+    },
     db: {
       username: config.get('env.MYSQL_USER') || 'db',
       password: config.getSecret('env.MYSQL_PASSWORD') || 'db',

@@ -115,6 +115,14 @@ export const deployment = (
                     name: 'PROMETHEUS_HOST',
                     value: `cerus-prometheus-kube-prom-prometheus.${config.namespace}.svc.cluster.local`,
                   },
+                  {
+                    name: 'AUTH0_ISSUER_BASE_URL',
+                    value: config.auth0.issuerBaseURL,
+                  },
+                  {
+                    name: 'DOMAIN',
+                    value: config.domain,
+                  },
                 ],
               },
             ],

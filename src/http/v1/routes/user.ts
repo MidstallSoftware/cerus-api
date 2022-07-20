@@ -1,9 +1,10 @@
 import { Router } from 'express'
-import { auth } from 'express-oauth2-jwt-bearer'
+import auth from '../../middleware/auth'
 import config from '../../../config'
 
 export default function genUserRoute() {
   const router = Router()
-  router.use(auth(config.auth0))
+
+  router.use(auth)
   return router
 }

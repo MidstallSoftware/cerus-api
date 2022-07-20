@@ -1,5 +1,5 @@
 import { Options as DBOptions } from '@mikro-orm/core'
-import { auth } from 'express-oauth2-jwt-bearer'
+import { expressjwt } from 'express-jwt'
 import { Options as SMTPOptions } from 'nodemailer/lib/smtp-transport'
 import { join } from 'path'
 import { RedisOptions } from 'ioredis'
@@ -25,7 +25,7 @@ interface Config {
   db: DBOptions
   cache: RedisOptions
   kafka: KafkaConfig
-  auth0: Parameters<typeof auth>[0]
+  auth0: Parameters<typeof expressjwt>[0]
   prometheus: {
     host: string
   }
@@ -56,10 +56,10 @@ const config: Config = {
   },
   port: parseInt(process.env.PORT || '80'),
   auth0: {
-    audience: `http://${domain}/v1/user`,
-    issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-    secret: process.env.AUTH0_SECRET,
-    tokenSigningAlg: 'HS256',
+    audience: `https://${domain}`,
+    issuer: process.env.AUTH0_ISSUER as string,
+    secret: process.env.AUTH0_SECRET as string,
+    algorithms: ['HS256'],
   },
   mail: {
     host: process.env.EMAIL_HOST,

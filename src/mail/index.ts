@@ -1,5 +1,5 @@
-import { compile, Data } from 'ejs'
-import { readdirSync, readFileSync } from 'fs'
+import { Data, compile } from 'ejs'
+import { readFileSync, readdirSync } from 'fs'
 import mjml from 'mjml'
 import Mail from 'nodemailer/lib/mailer'
 import { join } from 'path'

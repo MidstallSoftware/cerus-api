@@ -1,8 +1,8 @@
 import {
+  Entity,
+  BaseEntity as MOBaseEntity,
   PrimaryKey,
   Property,
-  BaseEntity as MOBaseEntity,
-  Entity,
 } from '@mikro-orm/core'
 import { APIObject } from '@cerusbots/common/dist/http/types'
 import { nowUTC } from '../utils'

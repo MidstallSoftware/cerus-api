@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { HttpError, HttpNotFoundError } from '../exceptions'
 import config from '../../config'
 import winston from '../../providers/winston'

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { BaseMessage } from '@cerusbots/common/dist/http/message'
 import { readCacher } from './base'
 

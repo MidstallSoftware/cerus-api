@@ -12,7 +12,7 @@ import config from './config'
 import { initCache } from './cache/client'
 import { initDatabase } from './database/client'
 import { initMail } from './mail/client'
-import { initKube, KubeDI } from './kube'
+import { KubeDI, initKube } from './kube'
 
 export const DI = {} as {
   cache: Redis

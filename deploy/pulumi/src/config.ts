@@ -14,7 +14,7 @@ export interface Configuration {
   hasNamespace: boolean
   domain: string
   auth0: {
-    issuerBaseURL: string
+    issuer: Output<string>
     secret: Output<string>
   }
   db: {
@@ -93,7 +93,7 @@ export function createConfig(config: Config): Configuration {
     hasNamespace,
     domain: `api.${domain}`,
     auth0: {
-      issuerBaseURL: config.require('auth0.issuerBaseURL'),
+      issuer: config.requireSecret('auth0.issuer'),
       secret: config.requireSecret('auth0.secret'),
     },
     db: {

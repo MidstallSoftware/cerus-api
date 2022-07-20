@@ -48,6 +48,7 @@ export const secret = (
         EMAIL_USERNAME: config.mail.username,
         EMAIL_PASSWORD: config.mail.password,
         AUTH0_SECRET: config.auth0.secret,
+        AUTH0_ISSUER: config.auth0.issuer,
       },
     },
     { provider, dependsOn }
@@ -115,10 +116,6 @@ export const deployment = (
                   {
                     name: 'PROMETHEUS_HOST',
                     value: `cerus-prometheus-kube-prom-prometheus.${config.namespace}.svc.cluster.local`,
-                  },
-                  {
-                    name: 'AUTH0_ISSUER_BASE_URL',
-                    value: config.auth0.issuerBaseURL,
                   },
                   {
                     name: 'DOMAIN',

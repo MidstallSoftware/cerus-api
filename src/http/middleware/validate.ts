@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express'
-import { validate, Schema } from 'jsonschema'
+import { NextFunction, Request, Response } from 'express'
+import { Schema, validate } from 'jsonschema'
 import { HttpValidationError } from '../exceptions'
 
 type GetDataFunction = (req: Request) => object

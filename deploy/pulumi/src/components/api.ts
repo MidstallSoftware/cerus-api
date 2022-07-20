@@ -47,6 +47,7 @@ export const secret = (
         STRIPE_KEY: config.stripe.key,
         EMAIL_USERNAME: config.mail.username,
         EMAIL_PASSWORD: config.mail.password,
+        AUTH0_SECRET: config.auth0.secret,
       },
     },
     { provider, dependsOn }

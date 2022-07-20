@@ -2,25 +2,15 @@ import { EntityManager } from '@mikro-orm/mariadb'
 import { startOfDay } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
 import fetch from 'node-fetch'
-import Bot from '../../../database/entities/bot'
 import User from '../../../database/entities/user'
 import { DI } from '../../../di'
 import config from '../../../config'
-import { HttpUnauthorizedError } from '../../exceptions'
 import { BaseMessage } from '@cerusbots/common/dist/http/message'
-import ac from '../../../rbac/sys'
 
 export default function genController() {
   return {
     prometheus: (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (typeof req.auth !== 'object' || typeof req.auth.user !== 'object')
-          throw new HttpUnauthorizedError('Authentication is required')
-
-        const perm = ac.can(req.auth.user.type).readAny('prometheus')
-        if (!perm.granted)
-          throw new HttpUnauthorizedError('Not authorized to access prometheus')
-
         fetch(
           `http://${
             config.prometheus.host
@@ -52,11 +42,7 @@ export default function genController() {
         const run = async () => {
           const em = DI.db.em.fork() as EntityManager
 
-          const botCount = (
-            await em.findAndCount(Bot, {
-              deletedAt: null,
-            })
-          )[1]
+          const botCount = 0 // TODO
 
           const userCount = (
             await em.findAndCount(User, {

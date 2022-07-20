@@ -56,8 +56,10 @@ const config: Config = {
   },
   port: parseInt(process.env.PORT || '80'),
   auth0: {
-    audience: `http://${domain}`,
+    audience: `http://${domain}/v1/user`,
     issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+    secret: process.env.AUTH0_SECRET,
+    tokenSigningAlg: 'HS256',
   },
   mail: {
     host: process.env.EMAIL_HOST,

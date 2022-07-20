@@ -15,6 +15,7 @@ export interface Configuration {
   domain: string
   auth0: {
     issuerBaseURL: string
+    secret: Output<string>
   }
   db: {
     password: string | Output<string>
@@ -93,6 +94,7 @@ export function createConfig(config: Config): Configuration {
     domain: `api.${domain}`,
     auth0: {
       issuerBaseURL: config.require('auth0.issuerBaseURL'),
+      secret: config.requireSecret('auth0.secret'),
     },
     db: {
       username: config.get('env.MYSQL_USER') || 'db',

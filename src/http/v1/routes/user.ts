@@ -1,12 +1,9 @@
 import { Router } from 'express'
-import genController from '../controllers/user'
-import { requireAuthHandler } from '../../middleware/auth'
+import { auth } from 'express-oauth2-jwt-bearer'
+import config from '../../../config'
 
 export default function genUserRoute() {
   const router = Router()
-  const controller = genController()
-
-  router.get('/', requireAuthHandler, controller.get)
-  router.delete('/', requireAuthHandler, controller.delete)
+  router.use(auth(config.auth0))
   return router
 }

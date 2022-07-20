@@ -14,15 +14,6 @@ export default function genController() {
   return {
     events: ((ws, req, next) => {
       try {
-        if (typeof req.auth !== 'object' || typeof req.auth.user !== 'object')
-          throw new HttpUnauthorizedError('Authentication is required')
-
-        const perm = ac.can(req.auth.user.type).readAny('system-events')
-        if (!perm)
-          throw new HttpUnauthorizedError(
-            'User does not have permission to stream system events'
-          )
-
         const { resource } = req.params
 
         const send = (msg: any) =>
@@ -37,7 +28,7 @@ export default function genController() {
         const kafkaResource = (topic: string) => {
           const run = async () => {
             const consumer = DI.kafka.consumer({
-              groupId: `admin-event-${req.auth?.user?.id}`,
+              groupId: `admin-event`,
             })
             await consumer.connect()
             await consumer.subscribe({ topic })
@@ -85,16 +76,6 @@ export default function genController() {
     }) as WebsocketRequestHandler,
     audit: (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (typeof req.auth !== 'object' || typeof req.auth.user !== 'object')
-          throw new HttpUnauthorizedError('Authentication is required')
-
-        const perm = ac.can(req.auth.user.type).readAny('system-audit')
-
-        if (!perm.granted)
-          throw new HttpUnauthorizedError(
-            'User does not have access to perform an audit'
-          )
-
         const { resource } = req.params
         const offset = parseInt((req.query.offset as string) || '0')
         const limit = parseInt((req.query.limit as string) || '5')

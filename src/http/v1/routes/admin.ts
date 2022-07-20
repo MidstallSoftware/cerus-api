@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { validateQuery } from '../../middleware/validate'
-import { authHandler, requireAuthHandler } from '../../middleware/auth'
 import genController from '../controllers/admin'
 
 export default function genAdminRoute() {
@@ -9,11 +8,7 @@ export default function genAdminRoute() {
 
   router.get('/metrics', controller.metrics)
 
-  router.ws(
-    '/events/:resource',
-    (_ws, req, next) => authHandler({ required: false })(req, null, next),
-    controller.events
-  )
+  router.ws('/events/:resource', controller.events)
   router.get(
     '/audit/:resource',
     validateQuery({
@@ -24,7 +19,6 @@ export default function genAdminRoute() {
         order: { type: 'string', enum: ['asc', 'dec'] },
       },
     }),
-    requireAuthHandler,
     controller.audit
   )
   return router

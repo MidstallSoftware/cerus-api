@@ -2,6 +2,74 @@ import * as k8s from '@pulumi/kubernetes'
 import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from '../config'
 
+export const serviceAccount = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new k8s.core.v1.ServiceAccount(
+    'cerus-api',
+    {
+      metadata: {
+        name: 'cerus-api',
+        namespace: config.namespace,
+      },
+      automountServiceAccountToken: true,
+    },
+    { provider, dependsOn }
+  )
+
+export const role = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new k8s.rbac.v1.Role(
+    'cerus-api',
+    {
+      metadata: {
+        name: 'cerus-api',
+        namespace: config.namespace,
+      },
+      rules: [
+        {
+          apiGroups: ['*'],
+          resources: ['*'],
+          verbs: ['*'],
+        },
+      ],
+    },
+    { provider, dependsOn }
+  )
+
+export const roleBinding = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new k8s.rbac.v1.RoleBinding(
+    'cerus-api',
+    {
+      metadata: {
+        name: 'cerus-api',
+        namespace: config.namespace,
+      },
+      subjects: [
+        {
+          kind: 'ServiceAccount',
+          name: 'cerus-api',
+          namespace: config.namespace,
+        },
+      ],
+      roleRef: {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'Role',
+        name: 'cerus-api',
+      },
+    },
+    { provider, dependsOn }
+  )
+
 export const serviceMonitor = (
   config: Configuration,
   provider?: k8s.Provider,
@@ -83,6 +151,8 @@ export const deployment = (
             },
           },
           spec: {
+            serviceAccountName: 'cerus-api',
+            serviceAccount: 'cerus-api',
             containers: [
               {
                 image: config.image,
@@ -114,12 +184,12 @@ export const deployment = (
                   { name: 'EMAIL_PORT', value: config.mail.port.toString() },
                   { name: 'EMAIL_HOST', value: config.mail.host },
                   {
-                    name: 'PROMETHEUS_HOST',
-                    value: `cerus-prometheus-kube-prom-prometheus.${config.namespace}.svc.cluster.local`,
-                  },
-                  {
                     name: 'DOMAIN',
                     value: config.domain,
+                  },
+                  {
+                    name: 'NAMESPACE',
+                    value: config.namespace,
                   },
                 ],
               },
@@ -167,7 +237,20 @@ export default function api(
 ) {
   dependsOn = dependsOn || []
   const secretRes = secret(config, provider, dependsOn)
-  const deploymentRes = deployment(config, provider, [...dependsOn, secretRes])
+  const serviceAccountRes = serviceAccount(config, provider, dependsOn)
+  const roleRes = role(config, provider, [...dependsOn, serviceAccountRes])
+  const roleBindingRes = roleBinding(config, provider, [
+    ...dependsOn,
+    serviceAccountRes,
+    roleRes,
+  ])
+  const deploymentRes = deployment(config, provider, [
+    ...dependsOn,
+    secretRes,
+    serviceAccountRes,
+    roleRes,
+    roleBindingRes,
+  ])
   const serviceRes = service(config, provider, [...dependsOn, deploymentRes])
   const serviceMonitorRes = serviceMonitor(config, provider, [
     ...dependsOn,

@@ -48,6 +48,7 @@
     "express-jwt": "^7.7.5",
     "express-ws": "^5.0.2",
     "ioredis": "^4.22.0",
+    "ipaddr": "^0.1.0",
     "jsonschema": "^1.4.0",
     "kafkajs": "^1.16.0",
     "mikro-orm-cache-adapter-redis": "^3.2.0",

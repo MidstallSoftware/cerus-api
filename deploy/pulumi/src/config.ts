@@ -41,22 +41,6 @@ export interface Configuration {
   }
   kafka: {
     brokers: string[]
-    storage: {
-      class: string
-      size: string
-    }
-  }
-  zookeeper: {
-    storage: {
-      class: string
-      size: string
-    }
-  }
-  grafana: {
-    storage: {
-      class: string
-      size: string
-    }
   }
   stripe: {
     key: Output<string>
@@ -129,22 +113,6 @@ export function createConfig(config: Config): Configuration {
         config.get('env.KAFKA_BROKERS') ||
         `cerus-kafka.${namespace}.svc.cluster.local:9092`
       ).split(','),
-      storage: {
-        class: config.get('kafka.storage.class') || storageClass,
-        size: config.get('kafka.storage.size') || '4Gi',
-      },
-    },
-    zookeeper: {
-      storage: {
-        class: config.get('zookeeper.storage.class') || storageClass,
-        size: config.get('zookeeper.storage.size') || '1Gi',
-      },
-    },
-    grafana: {
-      storage: {
-        class: config.get('grafana.storage.class') || storageClass,
-        size: config.get('grafana.storage.size') || '1Gi',
-      },
     },
     stripe: {
       key: config.requireSecret('env.STRIPE_KEY'),

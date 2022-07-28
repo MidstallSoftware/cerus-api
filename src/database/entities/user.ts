@@ -1,16 +1,16 @@
-import { Entity } from '@mikro-orm/core'
+import { Entity, Property } from '@mikro-orm/core'
 import Stripe from 'stripe'
 import { APIUser } from '@cerusbots/common/dist/http/types'
 import BaseEntity from '../base'
 
-export enum UserType {
-  DEFAULT = 'default',
-  ADMIN = 'admin',
-}
-
 @Entity()
 export default class User extends BaseEntity {
-  constructor() {
+  @Property()
+  auth0ID!: string
+
+  constructor(auth0ID: string) {
     super()
+
+    this.auth0ID = auth0ID
   }
 }

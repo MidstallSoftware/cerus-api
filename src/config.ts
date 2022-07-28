@@ -21,6 +21,7 @@ interface Config {
   production: boolean
   debug: boolean
   domain: string
+  namespace: string
   mail: SMTPOptions
   db: DBOptions
   cache: RedisOptions
@@ -50,6 +51,7 @@ const config: Config = {
   production,
   debug: !production,
   domain,
+  namespace: process.env.NAMESPACE as string,
   disabled: {
     stripe: parseEnvbool(process.env.DISABLE_STRIPE),
     sentry: parseEnvbool(process.env.DISABLE_SENTRY),
@@ -90,9 +92,6 @@ const config: Config = {
     retry: {
       retries: 30,
     },
-  },
-  prometheus: {
-    host: process.env.PROMETHEUS_HOST || 'prometheus',
   },
   logLevels: {
     test: 'error',

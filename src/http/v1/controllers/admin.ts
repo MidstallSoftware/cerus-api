@@ -9,6 +9,7 @@ import { BaseMessage } from '@cerusbots/common/dist/http/message'
 import ac from '../../../rbac/sys'
 import DatabaseAudit from '../../../database/entities/databaseaudit'
 import { DI } from '../../../di'
+import { isLocalIP } from '~/utils'
 
 export default function genController() {
   return {
@@ -127,47 +128,26 @@ export default function genController() {
       }
     },
     metrics: (req: Request, res: Response, next: NextFunction) => {
-      const remoteAddress = (req.socket.remoteAddress as string)
-        .replace('::ffff:', '')
-        .split('.')
-      const selfAddress = req.ip.replace('::ffff:', '').split('.')
+      const remoteAddress = (req.socket.remoteAddress as string).replace(
+        '::ffff:',
+        ''
+      )
 
-      const send = () => {
+      try {
+        if (!isLocalIP(remoteAddress)) {
+          throw new HttpUnauthorizedError(
+            'Must be send through the prometheus server'
+          )
+        }
+
         res.set('Content-Type', Prometheus.register.contentType)
         Prometheus.register
           .metrics()
           .then((v) => res.send(v))
           .catch((e) => next(e))
+      } catch (e) {
+        next(e)
       }
-
-      if (
-        remoteAddress[0] === selfAddress[0] &&
-        remoteAddress[1] === selfAddress[1] &&
-        remoteAddress[2] === selfAddress[2]
-      ) {
-        send()
-        return
-      }
-
-      resolve(config.prometheus.host)
-        .then((records) => {
-          try {
-            if (
-              !records
-                .map((v) => v.replace('::ffff:', ''))
-                .includes(remoteAddress.join('.'))
-            ) {
-              throw new HttpUnauthorizedError(
-                'Must be send through the prometheus server'
-              )
-            }
-
-            send()
-          } catch (e) {
-            next(e)
-          }
-        })
-        .catch((e) => next(e))
     },
   }
 }

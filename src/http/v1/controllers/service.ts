@@ -1,11 +1,12 @@
+import { BaseMessage } from '@cerusbots/common/dist/http/message'
 import { EntityManager } from '@mikro-orm/mariadb'
 import { startOfDay } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
 import fetch from 'node-fetch'
 import User from '../../../database/entities/user'
+import { findBots } from '../../../kube/bot'
 import { DI } from '../../../di'
 import config from '../../../config'
-import { BaseMessage } from '@cerusbots/common/dist/http/message'
 
 export default function genController() {
   return {
@@ -42,7 +43,7 @@ export default function genController() {
         const run = async () => {
           const em = DI.db.em.fork() as EntityManager
 
-          const botCount = 0 // TODO
+          const botCount = (await findBots()).length
 
           const userCount = (
             await em.findAndCount(User, {

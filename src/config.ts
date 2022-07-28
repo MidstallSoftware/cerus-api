@@ -27,9 +27,6 @@ interface Config {
   cache: RedisOptions
   kafka: KafkaConfig
   auth0: Parameters<typeof expressjwt>[0]
-  prometheus: {
-    host: string
-  }
   disabled: {
     stripe: boolean
     sentry: boolean

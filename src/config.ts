@@ -27,6 +27,9 @@ interface Config {
   cache: RedisOptions
   kafka: KafkaConfig
   auth0: Parameters<typeof expressjwt>[0]
+  prometheus: {
+    host: string
+  }
   disabled: {
     stripe: boolean
     sentry: boolean
@@ -83,6 +86,9 @@ const config: Config = {
     password: process.env.REDIS_PASSWORD,
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT || '6379'),
+  },
+  prometheus: {
+    host: process.env.PROMETHEUS_HOST || 'prometheus',
   },
   kafka: {
     brokers: (process.env.KAFKA_BROKERS || '').split(','),

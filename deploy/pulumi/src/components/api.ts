@@ -184,6 +184,10 @@ export const deployment = (
                   { name: 'EMAIL_PORT', value: config.mail.port.toString() },
                   { name: 'EMAIL_HOST', value: config.mail.host },
                   {
+                    name: 'PROMETHEUS_HOST',
+                    value: config.prometheus.host,
+                  },
+                  {
                     name: 'DOMAIN',
                     value: config.domain,
                   },

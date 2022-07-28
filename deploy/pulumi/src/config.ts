@@ -33,6 +33,9 @@ export interface Configuration {
       size: string
     }
   }
+  prometheus: {
+    host: string
+  }
   mail: {
     host: string
     port: number
@@ -113,6 +116,11 @@ export function createConfig(config: Config): Configuration {
         config.get('env.KAFKA_BROKERS') ||
         `cerus-kafka.${namespace}.svc.cluster.local:9092`
       ).split(','),
+    },
+    prometheus: {
+      host:
+        config.get('prometheus.host') ||
+        `cerus-prometheus-kube-prom-prometheus.${namespace}.svc.cluster.local`,
     },
     stripe: {
       key: config.requireSecret('env.STRIPE_KEY'),

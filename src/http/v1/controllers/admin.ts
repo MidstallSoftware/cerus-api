@@ -9,7 +9,7 @@ import { BaseMessage } from '@cerusbots/common/dist/http/message'
 import ac from '../../../rbac/sys'
 import DatabaseAudit from '../../../database/entities/databaseaudit'
 import { DI } from '../../../di'
-import { isLocalIP } from '~/utils'
+import { isLocalIP } from '../../../utils'
 
 export default function genController() {
   return {

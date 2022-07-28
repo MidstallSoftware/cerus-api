@@ -1,6 +1,4 @@
 import { Entity, Property } from '@mikro-orm/core'
-import Stripe from 'stripe'
-import { APIUser } from '@cerusbots/common/dist/http/types'
 import BaseEntity from '../base'
 
 @Entity()

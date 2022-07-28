@@ -25,7 +25,7 @@ export function postMetricHandler(
     })
     .observe(time)
   winston.debug(
-    `Took ${time}ms to respond to ${res.socket?.remoteAddress} for ${req.url} (${req.method})`
+    `Took ${time}ms to respond to ${req.socket.remoteAddress} for ${req.url} (${req.method})`
   )
   next()
 }

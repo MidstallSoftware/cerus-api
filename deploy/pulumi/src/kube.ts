@@ -10,7 +10,9 @@ import mailhog from './components/mailhog'
 import namespace from './components/namespace'
 
 export function createKube(config: Configuration, provider?: k8s.Provider) {
-  const dependsOn: pulumi.Resource[] = []
+  const dependsOn: pulumi.Resource[] = [
+    new pulumi.StackReference(`CerusBots/runner/${config.name}`),
+  ]
   if (!config.hasNamespace) dependsOn.push(namespace(config, provider))
   else dependsOn.push(new pulumi.StackReference(`CerusBots/k8s/${config.name}`))
 

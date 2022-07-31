@@ -2,7 +2,6 @@ import * as k8s from '@pulumi/kubernetes'
 import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from './config'
 
-import adminer from './components/adminer'
 import api from './components/api'
 import cache from './components/cache'
 import db from './components/db'
@@ -24,9 +23,8 @@ export function createKube(config: Configuration, provider?: k8s.Provider) {
   const baseRes = [...cacheRes, ...dbRes, ...apiRes]
 
   if (config.dev) {
-    const adminerRes = adminer(config, provider, [...dependsOn, ...dbRes])
     const mailhogRes = mailhog(config, provider, dependsOn)
-    return [...baseRes, ...adminerRes, ...mailhogRes]
+    return [...baseRes, ...mailhogRes]
   }
   return baseRes
 }

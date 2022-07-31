@@ -1,50 +1,84 @@
+import * as mysql from '@pulumi/mysql'
 import * as k8s from '@pulumi/kubernetes'
 import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from '../config'
 
-export const release = (
+export const user = (
   config: Configuration,
-  provider?: k8s.Provider,
+  provider?: mysql.Provider,
   dependsOn?: pulumi.Resource[]
 ) =>
-  new k8s.helm.v3.Release(
-    'cerus-api-db',
+  new mysql.User(
+    'user',
     {
-      name: 'cerus-api-db',
-      chart: 'mariadb',
-      namespace: config.namespace,
-      repositoryOpts: {
-        repo: 'https://charts.bitnami.com/bitnami',
-      },
-      values: {
-        global: {
-          storageClass: config.db.storage.class,
-        },
-        auth: {
-          password: config.db.password,
-          username: config.db.username,
-          database: config.db.name,
-        },
-        primary: {
-          persistence: {
-            size: config.db.storage.size,
-          },
-        },
-        metrics: {
-          enabled: true,
-          serviceMonitor: {
-            enabled: true,
-          },
-        },
-      },
+      host: config.db.host,
+      user: config.db.user.name,
+      plaintextPassword: config.db.user.password,
+    },
+    { provider, dependsOn }
+  )
+
+export const database = (
+  config: Configuration,
+  provider?: mysql.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new mysql.Database(
+    'database',
+    {
+      name: config.db.name,
+    },
+    { provider, dependsOn }
+  )
+
+export const grant = (
+  config: Configuration,
+  provider?: mysql.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new mysql.Grant(
+    'user-grant',
+    {
+      database: config.db.name,
+      host: config.db.host,
+      user: config.db.user.name,
+      privileges: [
+        'ALTER',
+        'CREATE',
+        'CREATE VIEW',
+        'DELETE',
+        'DELETE HISTORY',
+        'DROP',
+        'GRANT OPTION',
+        'INDEX',
+        'INSERT',
+        'SELECT',
+        'SHOW VIEW',
+        'TRIGGER',
+        'UPDATE',
+      ],
     },
     { provider, dependsOn }
   )
 
 export default function db(
   config: Configuration,
-  provider?: k8s.Provider,
+  kubeProvider?: k8s.Provider,
   dependsOn?: pulumi.Resource[]
 ) {
-  return [release(config, provider, dependsOn)]
+  dependsOn = dependsOn || []
+  const provider = new mysql.Provider(
+    'mariadb',
+    {
+      endpoint: config.db.host,
+      username: config.db.root.name,
+      password: config.db.root.password,
+    },
+    { provider: kubeProvider, dependsOn }
+  )
+
+  const userRes = user(config, provider, [...dependsOn, provider])
+  const dbRes = database(config, provider, [...dependsOn, provider])
+  const grantRes = grant(config, provider, [...dependsOn, userRes, dbRes])
+  return [grantRes, userRes, dbRes]
 }

@@ -12,7 +12,6 @@ import config from './config'
 import { initCache } from './cache/client'
 import { initDatabase } from './database/client'
 import { initMail } from './mail/client'
-import { KubeDI, initKube } from './kube'
 
 export const DI = {} as {
   cache: Redis
@@ -21,7 +20,6 @@ export const DI = {} as {
   mail: Transporter<SMTPSentMessageInfo>
   prometheus: PrometheusDriver
   stripe?: Stripe
-  k8s: KubeDI
   serverStart: Date
 }
 
@@ -53,8 +51,6 @@ export async function init() {
         apiVersion: '2020-08-27',
         typescript: true,
       })
-
-  DI.k8s = await initKube()
 
   DI.serverStart = utcToZonedTime(new Date().toUTCString(), config.timezone)
   Prometheus.collectDefaultMetrics({ prefix: 'cerus_api_' })

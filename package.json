@@ -29,7 +29,6 @@
   "dependencies": {
     "@cerusbots/common": "file:submodules/common",
     "@discordjs/builders": "0.13.0",
-    "@kubernetes/client-node": "^0.17.0",
     "@mikro-orm/core": "^5.1.2",
     "@mikro-orm/mariadb": "^5.1.2",
     "@mikro-orm/migrations": "^5.1.2",

@@ -4,7 +4,6 @@ import { startOfDay } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
 import fetch from 'node-fetch'
 import User from '../../../database/entities/user'
-import { findBots } from '../../../kube/bot'
 import { DI } from '../../../di'
 import config from '../../../config'
 
@@ -43,7 +42,7 @@ export default function genController() {
         const run = async () => {
           const em = DI.db.em.fork() as EntityManager
 
-          const botCount = (await findBots()).length
+          const botCount = 0
 
           const userCount = (
             await em.findAndCount(User, {

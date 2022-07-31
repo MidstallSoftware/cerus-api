@@ -23,7 +23,7 @@ export const release = (
         auth: {
           password: config.cache.password,
         },
-        architecture: 'standalone',
+        architecture: 'replication',
         master: {
           persistence: {
             size: config.cache.storage.size,

@@ -18,13 +18,16 @@ export interface Configuration {
     secret: Output<string>
   }
   db: {
-    password: string | Output<string>
-    username: string
-    name: string
-    storage: {
-      class: string
-      size: string
+    root: {
+      password: string | Output<string>
+      name: string
     }
+    user: {
+      password: string | Output<string>
+      name: string
+    }
+    name: string
+    host: string
   }
   cache: {
     password: string | Output<string>
@@ -84,13 +87,16 @@ export function createConfig(config: Config): Configuration {
       secret: config.requireSecret('auth0.secret'),
     },
     db: {
-      username: config.get('env.MYSQL_USER') || 'db',
-      password: config.getSecret('env.MYSQL_PASSWORD') || 'db',
-      name: config.get('env.MYSQL_DATABASE') || 'db',
-      storage: {
-        class: config.get('db.storage.class') || storageClass,
-        size: config.get('db.storage.size') || '4Gi',
+      root: {
+        name: config.get('db.root.name') || 'root',
+        password: config.getSecret('db.root.password') || 'db',
       },
+      user: {
+        name: config.get('db.root.name') || 'runner',
+        password: config.getSecret('db.root.password') || 'db',
+      },
+      name: config.get('db.name') || 'api',
+      host: config.get('db.host') || `localhost`,
     },
     cache: {
       password: config.getSecret('env.REDIS_PASSWORD') || 'cache',

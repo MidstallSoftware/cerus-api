@@ -2,74 +2,6 @@ import * as k8s from '@pulumi/kubernetes'
 import * as pulumi from '@pulumi/pulumi'
 import { Configuration } from '../config'
 
-export const serviceAccount = (
-  config: Configuration,
-  provider?: k8s.Provider,
-  dependsOn?: pulumi.Resource[]
-) =>
-  new k8s.core.v1.ServiceAccount(
-    'cerus-api',
-    {
-      metadata: {
-        name: 'cerus-api',
-        namespace: config.namespace,
-      },
-      automountServiceAccountToken: true,
-    },
-    { provider, dependsOn }
-  )
-
-export const role = (
-  config: Configuration,
-  provider?: k8s.Provider,
-  dependsOn?: pulumi.Resource[]
-) =>
-  new k8s.rbac.v1.Role(
-    'cerus-api',
-    {
-      metadata: {
-        name: 'cerus-api',
-        namespace: config.namespace,
-      },
-      rules: [
-        {
-          apiGroups: ['*'],
-          resources: ['*'],
-          verbs: ['*'],
-        },
-      ],
-    },
-    { provider, dependsOn }
-  )
-
-export const roleBinding = (
-  config: Configuration,
-  provider?: k8s.Provider,
-  dependsOn?: pulumi.Resource[]
-) =>
-  new k8s.rbac.v1.RoleBinding(
-    'cerus-api',
-    {
-      metadata: {
-        name: 'cerus-api',
-        namespace: config.namespace,
-      },
-      subjects: [
-        {
-          kind: 'ServiceAccount',
-          name: 'cerus-api',
-          namespace: config.namespace,
-        },
-      ],
-      roleRef: {
-        apiGroup: 'rbac.authorization.k8s.io',
-        kind: 'Role',
-        name: 'cerus-api',
-      },
-    },
-    { provider, dependsOn }
-  )
-
 export const serviceMonitor = (
   config: Configuration,
   provider?: k8s.Provider,
@@ -107,8 +39,8 @@ export const secret = (
         namespace: config.namespace,
       },
       stringData: {
-        MYSQL_USER: config.db.username,
-        MYSQL_PASSWORD: config.db.password,
+        MYSQL_USER: config.db.user.name,
+        MYSQL_PASSWORD: config.db.user.password,
         MYSQL_DATABASE: config.db.name,
         REDIS_PASSWORD: config.cache.password,
         SENTRY_DSN: config.sentry.dsn,
@@ -151,8 +83,6 @@ export const deployment = (
             },
           },
           spec: {
-            serviceAccountName: 'cerus-api',
-            serviceAccount: 'cerus-api',
             containers: [
               {
                 image: config.image,
@@ -179,7 +109,10 @@ export const deployment = (
                     name: 'KAFKA_BROKERS',
                     value: config.kafka.brokers.join(','),
                   },
-                  { name: 'MYSQL_HOST', value: 'cerus-api-db-mariadb' },
+                  {
+                    name: 'MYSQL_HOST',
+                    value: `cerus-db-mariadb-primary.${config.namespace}.svc.cluster.local`,
+                  },
                   { name: 'REDIS_HOST', value: 'cerus-api-cache-redis-master' },
                   { name: 'EMAIL_PORT', value: config.mail.port.toString() },
                   { name: 'EMAIL_HOST', value: config.mail.host },
@@ -241,20 +174,7 @@ export default function api(
 ) {
   dependsOn = dependsOn || []
   const secretRes = secret(config, provider, dependsOn)
-  const serviceAccountRes = serviceAccount(config, provider, dependsOn)
-  const roleRes = role(config, provider, [...dependsOn, serviceAccountRes])
-  const roleBindingRes = roleBinding(config, provider, [
-    ...dependsOn,
-    serviceAccountRes,
-    roleRes,
-  ])
-  const deploymentRes = deployment(config, provider, [
-    ...dependsOn,
-    secretRes,
-    serviceAccountRes,
-    roleRes,
-    roleBindingRes,
-  ])
+  const deploymentRes = deployment(config, provider, [...dependsOn, secretRes])
   const serviceRes = service(config, provider, [...dependsOn, deploymentRes])
   const serviceMonitorRes = serviceMonitor(config, provider, [
     ...dependsOn,

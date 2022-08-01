@@ -167,6 +167,50 @@ export const service = (
     }
   )
 
+export const autoscaler = (
+  config: Configuration,
+  provider?: k8s.Provider,
+  dependsOn?: pulumi.Resource[]
+) =>
+  new k8s.autoscaling.v2.HorizontalPodAutoscaler('cerus-api', {
+    metadata: {
+      labels: {
+        app: 'cerus-api',
+      },
+      name: 'cerus-api',
+      namespace: config.namespace,
+    },
+    spec: {
+      maxReplicas: 10,
+      minReplicas: 1,
+      scaleTargetRef: {
+        apiVersion: 'apps/v1',
+        kind: 'Deployment',
+        name: 'cerus-api',
+      },
+      behavior: {
+        scaleDown: {
+          stabilizationWindowSeconds: 0,
+        },
+        scaleUp: {
+          stabilizationWindowSeconds: 60,
+        },
+      },
+      metrics: [
+        {
+          type: 'Resource',
+          resource: {
+            name: 'cpu',
+            target: {
+              type: 'Utilization',
+              averageUtilization: 60,
+            },
+          },
+        },
+      ],
+    },
+  })
+
 export default function api(
   config: Configuration,
   provider?: k8s.Provider,

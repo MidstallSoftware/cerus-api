@@ -14,4 +14,4 @@ docker_build('ghcr.io/cerusbots/api:latest', '.', dockerfile='./Dockerfile.dev',
   run('npm run build', trigger='submodules/common')
 ])
 
-pulumi_resource('cerus-api', stack='CerusBots/api/dev', dir='deploy/pulumi', image_deps=['ghcr.io/cerusbots/api:latest'], image_configs=['image'], labels=['cerus'], port_forwards=['3002:80'])
+pulumi_resource('cerus-api', stack='CerusBots/api/dev', dir='deploy/pulumi', image_deps=['ghcr.io/cerusbots/api:latest'], image_configs=['image'], labels=['cerus'], port_forwards=['8081:80'])

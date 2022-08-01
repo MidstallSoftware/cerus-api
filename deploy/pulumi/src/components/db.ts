@@ -11,7 +11,7 @@ export const user = (
   new mysql.User(
     'user',
     {
-      host: config.db.host,
+      host: '%',
       user: config.db.user.name,
       plaintextPassword: config.db.user.password,
     },
@@ -40,7 +40,7 @@ export const grant = (
     'user-grant',
     {
       database: config.db.name,
-      host: config.db.host,
+      host: '%',
       user: config.db.user.name,
       privileges: [
         'ALTER',

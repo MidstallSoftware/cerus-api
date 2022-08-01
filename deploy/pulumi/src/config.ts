@@ -1,3 +1,4 @@
+import * as k8s from '@pulumi/kubernetes'
 import { Config, Output } from '@pulumi/pulumi'
 import { githubImage } from './utils/image'
 import { parse } from 'yaml'
@@ -92,11 +93,11 @@ export function createConfig(config: Config): Configuration {
         password: config.getSecret('db.root.password') || 'db',
       },
       user: {
-        name: config.get('db.root.name') || 'runner',
-        password: config.getSecret('db.root.password') || 'db',
+        name: config.get('db.user.name') || 'api',
+        password: config.getSecret('db.user.password') || 'db',
       },
       name: config.get('db.name') || 'api',
-      host: config.get('db.host') || `localhost`,
+      host: config.get('db.host') || 'localhost:30000',
     },
     cache: {
       password: config.getSecret('env.REDIS_PASSWORD') || 'cache',
